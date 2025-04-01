@@ -1,0 +1,25 @@
+{
+  "name": "@thechatapp/express-passport-login-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "nx": {
+    "implicitDependencies": [
+      "@thechatapp/express-passport-login"
+    ],
+    "targets": {
+      "e2e": {
+        "executor": "@nx/jest:jest",
+        "outputs": [
+          "{projectRoot}/test-output/jest/coverage"
+        ],
+        "options": {
+          "jestConfig": "apps/express-passport-login-e2e/jest.config.ts",
+          "passWithNoTests": true
+        },
+        "dependsOn": [
+          "@thechatapp/express-passport-login:build"
+        ]
+      }
+    }
+  }
+}

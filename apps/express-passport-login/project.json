@@ -1,0 +1,32 @@
+{
+    "name": "@thechatapp/express-passport-login",
+    "root": "apps/express-passport-login",
+    "sourceRoot": "apps/express-passport-login/src",
+    "projectType": "application",
+    "targets": {
+      "serve": {
+        "executor": "@nx/js:node",
+        "defaultConfiguration": "development",
+        "dependsOn": [
+          "build"
+        ],
+        "options": {
+          "buildTarget": "@thechatapp/express-passport-login:build",
+          "runBuildTargetDependencies": false
+        },
+        "configurations": {
+          "development": {
+            "buildTarget": "@thechatapp/express-passport-login:build:development"
+          },
+          "production": {
+            "buildTarget": "@thechatapp/express-passport-login:build:production"
+          }
+        }
+      },
+      "test": {
+        "options": {
+          "passWithNoTests": true
+        }
+      }
+    }
+}

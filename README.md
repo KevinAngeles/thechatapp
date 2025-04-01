@@ -1,90 +1,106 @@
-# Thechatapp
+# The Chat App
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+The Chat App is a monorepo that contains three distinct projects, each serving a specific purpose in building a modern chat application. This monorepo is managed using [Nx](https://nx.dev/), which provides a powerful toolset for managing multiple projects in a single repository.
 
-✨ Your new, shiny [Nx workspace](https://nx.dev) is almost ready ✨.
+---
 
-[Learn more about this workspace setup and its capabilities](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects) or run `npx nx graph` to visually explore what was created. Now, let's get you up to speed!
+## Projects in the Monorepo
 
-## Finish your CI setup
+### 1. **express-passport-login**
+This project is a Node.js application using Express and Passport.js to handle user authentication. It provides APIs for user login, registration, and session management, leveraging JWT for secure authentication.
 
-[Click here to finish setting up your workspace!](https://cloud.nx.app/connect/Raap0c9q9T)
+- **Purpose**: Backend authentication service for the chat application.
+- **Key Features**:
+  - User login and registration.
+  - JWT-based authentication.
+  - Session management with `express-session`.
 
+---
 
-## Generate a library
+### 2. **redux-vite-apollo-chat**
+This project is a frontend application built with React, Redux, and Apollo Client. It serves as the user interface for the chat application, allowing users to send and receive messages in real-time.
 
-```sh
-npx nx g @nx/js:lib packages/pkg1 --publishable --importPath=@my-org/pkg1
-```
+- **Purpose**: Frontend for the chat application.
+- **Key Features**:
+  - Real-time messaging.
+  - State management with Redux.
+  - GraphQL integration with Apollo Client.
 
-## Run tasks
+---
 
-To build the library use:
+### 3. **chat-express-graphql-ws**
+This project is a Node.js application using Express, GraphQL, and WebSocket. It provides the backend for real-time messaging, handling GraphQL queries, mutations, and subscriptions.
 
-```sh
-npx nx build pkg1
-```
+- **Purpose**: Backend for real-time messaging.
+- **Key Features**:
+  - GraphQL API for chat messages.
+  - WebSocket server for real-time communication.
+  - Integration with Apollo Server.
 
-To run any task with Nx use:
+---
 
-```sh
-npx nx <target> <project-name>
-```
+## Monorepo Purpose
+The monorepo is designed to streamline the development and management of the chat application by housing all related projects in a single repository. Using Nx, developers can efficiently build, serve, and test individual projects or the entire application.
 
-These targets are either [inferred automatically](https://nx.dev/concepts/inferred-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects) or defined in the `project.json` or `package.json` files.
+---
 
-[More about running tasks in the docs &raquo;](https://nx.dev/features/run-tasks?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+## Available Commands
 
-## Versioning and releasing
+### Serve Projects Individually
+- **Serve express-passport-login**:
+  ```
+  npx nx serve express-passport-login
+  ```
+- **Serve redux-vite-apollo-chat**:
+  ```
+  npx nx serve redux-vite-apollo-chat
+  ```
+- **Serve chat-express-graphql-ws**:
+  ```
+  npx nx serve chat-express-graphql-ws
+  ```
 
-To version and release the library use
+### Build Projects Individually
+- **Build express-passport-login**:
+  ```
+  npx nx build express-passport-login
+  ```
+- **Build redux-vite-apollo-chat**:
+  ```
+  npx nx build redux-vite-apollo-chat
+  ```
+- **Build chat-express-graphql-ws**:
+  ```
+  npx nx serve chat-express-graphql-ws
+  ```
+  
+### Serve All Projects at Once
+- **To serve all projects simultaneously**:
+  ```
+  npx nx run-many --target=serve --all
+  ```
 
-```
-npx nx release
-```
+### Build All Projects at Once
+- **To build all projects simultaneously**:
+  ```
+  npx nx run-many --target=build --all
+  ```
 
-Pass `--dry-run` to see what would happen without actually releasing the library.
+## Getting Started
+1. Clone the repository:
+  ```
+  git clone https://github.com/KevinAngeles/thechatapp
+  cd thechatapp
+  ```
 
-[Learn more about Nx release &raquo;](hhttps://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+2. Install dependencies:
+  ```
+  npm install
+  ```
 
-## Keep TypeScript project references up to date
+3. Serve or build the projects using the commands listed above.
 
-Nx automatically updates TypeScript [project references](https://www.typescriptlang.org/docs/handbook/project-references.html) in `tsconfig.json` files to ensure they remain accurate based on your project dependencies (`import` or `require` statements). This sync is automatically done when running tasks such as `build` or `typecheck`, which require updated references to function correctly.
+## Author
+This project was created and maintained by [**Kevin Angeles**](https://www.kevinangeles.com/).
 
-To manually trigger the process to sync the project graph dependencies information to the TypeScript project references, run the following command:
-
-```sh
-npx nx sync
-```
-
-You can enforce that the TypeScript project references are always in the correct state when running in CI by adding a step to your CI job configuration that runs the following command:
-
-```sh
-npx nx sync:check
-```
-
-[Learn more about nx sync](https://nx.dev/reference/nx-commands#sync)
-
-
-[Learn more about Nx on CI](https://nx.dev/ci/intro/ci-with-nx#ready-get-started-with-your-provider?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Install Nx Console
-
-Nx Console is an editor extension that enriches your developer experience. It lets you run tasks, generate code, and improves code autocompletion in your IDE. It is available for VSCode and IntelliJ.
-
-[Install Nx Console &raquo;](https://nx.dev/getting-started/editor-setup?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-## Useful links
-
-Learn more:
-
-- [Learn more about this workspace setup](https://nx.dev/nx-api/js?utm_source=nx_project&amp;utm_medium=readme&amp;utm_campaign=nx_projects)
-- [Learn about Nx on CI](https://nx.dev/ci/intro/ci-with-nx?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [Releasing Packages with Nx release](https://nx.dev/features/manage-releases?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-- [What are Nx plugins?](https://nx.dev/concepts/nx-plugins?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
-
-And join the Nx community:
-- [Discord](https://go.nx.dev/community)
-- [Follow us on X](https://twitter.com/nxdevtools) or [LinkedIn](https://www.linkedin.com/company/nrwl)
-- [Our Youtube channel](https://www.youtube.com/@nxdevtools)
-- [Our blog](https://nx.dev/blog?utm_source=nx_project&utm_medium=readme&utm_campaign=nx_projects)
+Feel free to reach out for questions or contributions!
