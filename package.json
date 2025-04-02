@@ -1,6 +1,6 @@
 {
   "name": "@thechatapp2/source",
-  "version": "0.0.0",
+  "version": "0.0.5",
   "license": "MIT",
   "scripts": {
     "start": "nx run-many --target=serve --all"

@@ -1,9 +1,8 @@
 {
   "name": "@thechatapp/express-passport-graphql-chat",
-  "version": "0.0.1",
   "description": "Server code for a chat application using JWT with Express and Passport.js to handle authentication.",
   "author": "KevinAngeles",
-  "main": "dist/server.js",
+  "main": "dist/main.js",
   "private": true,
   "dependencies": {
     "bcryptjs": "^3.0.2",
