@@ -1,18 +1,18 @@
-/// <reference types="vitest" />
+/// <reference types='vitest' />
 import { defineConfig } from 'vite';
-import { resolve } from 'path';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig(() => ({
   root: __dirname,
   cacheDir: '../../node_modules/.vite/apps/redux-vite-apollo-chat',
   server:{
-    open: true,
     port: process.env.VITE_PORT ? parseInt(process.env.VITE_PORT) : 5173,
+    // port: 4200,
     host: 'localhost',
   },
   preview:{
     port: process.env.VITE_PORT ? parseInt(process.env.VITE_PORT) : 5173,
+    // port: 4300,
     host: 'localhost',
   },
   plugins: [react()],
@@ -28,9 +28,15 @@ export default defineConfig(() => ({
       transformMixedEsModules: true,
     },
   },
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, './src'),
+  test: {
+    watch: false,
+    globals: true,
+    environment: 'jsdom',
+    include: ['{src,tests}/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    reporters: ['default'],
+    coverage: {
+      reportsDirectory: './test-output/vitest/coverage',
+      provider: 'v8' as const,
     }
   },
 }));

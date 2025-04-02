@@ -1,14 +1,14 @@
-import { ApolloClient, InMemoryCache, ApolloProvider, useQuery, useMutation, gql, QueryResult, useSubscription } from '@apollo/client';
+import { ApolloClient, InMemoryCache, ApolloProvider, useMutation, gql, useSubscription } from '@apollo/client';
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { useState } from 'react';
 import { split, HttpLink } from '@apollo/client';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { createClient } from 'graphql-ws';
-import { OnMessageSubscription, OnMessageSubscriptionVariables, IMessage, IChat } from '@/types/types';
+import { OnMessageSubscription, OnMessageSubscriptionVariables } from '../../types/types';
 import { useSelector } from 'react-redux';
-import { logoutUser, selectLoggedUser } from '@/components/appSlice';
-import { useAppDispatch } from '@/app/hooks';
+import { logoutUser, selectLoggedUser } from '../../components/appSlice';
+import { useAppDispatch } from '../../app/hooks';
 const GRAPHQL_URL_HTTP = import.meta.env.VITE_GRAPHQL_URL_HTTP as string;
 const GRAPHQL_URL_WS = import.meta.env.VITE_GRAPHQL_URL_WS as string;
 const httpLink = new HttpLink({
@@ -39,16 +39,6 @@ const splitLink = split(
     httpLink,
 );
 
-const GET_MESSAGES = gql`
-query {
-    messages {
-        id
-        content
-        user
-        nickname
-    }
-}`;
-
 const POST_MESSAGE = gql`
 mutation ($user: String!, $nickname: String!, $content: String!) {
     postMessage(user: $user, nickname: $nickname, content: $content)
@@ -75,11 +65,7 @@ const client = new ApolloClient({
 const Messages = () => {
     // const { data }: QueryResult<IMessage> = useQuery(SUBSCRIBE_MESSAGES, /*{
     const [postMessage] = useMutation(POST_MESSAGE);
-    const [messageErrorMessage, setMessageErrorMessage] = useState('');
     const [messageChat, setMessageChat] = useState("");
-    const [userErrorMessage, setUserErrorMessage] = useState('');
-    const [userError, setUserError] = useState(false);
-    const [messageError, setMessageError] = useState(false);
     // retrieve the user from the store using the useSelector hook
     const userChat = useSelector(selectLoggedUser);
     const { data } = useSubscription<OnMessageSubscription, OnMessageSubscriptionVariables>(MESSAGE_SUBSCRIPTION, { variables: { user: "", nickname: "" } });

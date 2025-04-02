@@ -1,11 +1,11 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { EnhancedStore, StoreEnhancer, ThunkDispatch, Tuple, UnknownAction } from '@reduxjs/toolkit';
-import { Login } from '@/components/login/Login';
-import { loginUser } from '@/components/login/loginSlice';
-import { setLoggedUser, setPage } from '@/components/appSlice';
-import { AppSliceState, IAuthenticatedUser, ILoginPayload, IErrorData, IValidData, LoginSliceState } from '@/types/types';
+import { Login } from '../../components/login/Login';
+import { loginUser } from '../../components/login/loginSlice';
+import { setLoggedUser, setPage } from '../../components/appSlice';
+import { AppSliceState, IAuthenticatedUser, ILoginPayload, IErrorData, IValidData, LoginSliceState } from '../../types/types';
 import { Provider } from 'react-redux';
-import { makeStore } from '@/app/store';
+import { makeStore } from '../../app/store';
 import { vi, describe, expect, beforeEach, afterEach } from 'vitest';
 
 let store: EnhancedStore<{

@@ -9,7 +9,7 @@ import './style/app.scss';
 import './style/sign.scss';
 import './style/chat.scss';
 
-let getCookie = (name: string): { validUntil: Date } | null => {
+const getCookie = (name: string): { validUntil: Date } | null => {
   const match = document.cookie.match(`(?:(?:^|.*; *)${name} *= *([^;]*).*$)|^.*$`);
   const c = match ? match[1] : '';
   if (c) {
@@ -63,7 +63,7 @@ export default function App(props: { disableCustomTheme?: boolean }) {
       }
     }
     fetchData();
-  }, []);
+  }, [dispatch]);
   return (
     LOGGED_USER ? (
       <Chat />

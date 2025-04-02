@@ -1,4 +1,4 @@
-import { validateLoginInputs } from "@/utils";
+import { validateLoginInputs } from "../utils";
 
 describe('validateLoginInputs', () => {
   test('validateLoginInputs sets errors for invalid inputs', () => {
@@ -11,9 +11,9 @@ describe('validateLoginInputs', () => {
       password: 'Password must contain at least 8 characters, including letters and numbers',
       general: 'Invalid credentials'
     }
-    let userId = invalidLoginInputs.userId;
-    let password = invalidLoginInputs.password;
-    let { userIdMessageValidation, passwordMessageValidation } = validateLoginInputs(userId, password);
+    const userId = invalidLoginInputs.userId;
+    const password = invalidLoginInputs.password;
+    const { userIdMessageValidation, passwordMessageValidation } = validateLoginInputs(userId, password);
     expect(userIdMessageValidation).toBe(loginErrorMessages.userId);
     expect(passwordMessageValidation).toBe(loginErrorMessages.password);
   });
@@ -22,9 +22,9 @@ describe('validateLoginInputs', () => {
       userId: 'user@email.com',
       password: 'Password123'
     };
-    let userId = validLoginInputs.userId;
-    let password = validLoginInputs.password;
-    let { userIdMessageValidation, passwordMessageValidation } = validateLoginInputs(userId, password);
+    const userId = validLoginInputs.userId;
+    const password = validLoginInputs.password;
+    const { userIdMessageValidation, passwordMessageValidation } = validateLoginInputs(userId, password);
     expect(userIdMessageValidation).toBe("");
     expect(passwordMessageValidation).toBe("");
   });

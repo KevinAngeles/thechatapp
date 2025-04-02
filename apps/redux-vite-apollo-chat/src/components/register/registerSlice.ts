@@ -1,8 +1,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import { createAppSlice } from "@/app/createAppSlice"
-import { isErrorData, postRegister } from "@/components/AuthenticationAPI"
-import { setLoggedUser, setPage } from "@/components/appSlice"
-import { IRegisterPayload, RegisterSliceState } from "@/types/types"
+import { createAppSlice } from "../../app/createAppSlice"
+import { isErrorData, postRegister } from "../../components/AuthenticationAPI"
+import { setLoggedUser, setPage } from "../../components/appSlice"
+import { IRegisterPayload, RegisterSliceState } from "../../types/types"
 
 const initialState: RegisterSliceState = {
   registerStatus: "idle",

@@ -1,8 +1,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit"
-import { createAppSlice } from "@/app/createAppSlice"
-import { isErrorData, postLogin } from "@/components/AuthenticationAPI"
-import type { ILoginPayload, LoginSliceState } from "@/types/types"
-import { setLoggedUser, setPage } from "@/components/appSlice"
+import { createAppSlice } from "../../app/createAppSlice"
+import { isErrorData, postLogin } from "../../components/AuthenticationAPI"
+import type { ILoginPayload, LoginSliceState } from "../../types/types"
+import { setLoggedUser, setPage } from "../../components/appSlice"
 
 const initialState: LoginSliceState = {
   loginStatus: 'idle'
