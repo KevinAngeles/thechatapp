@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { useAppDispatch } from "@/app/hooks"
+import { useAppDispatch } from "../../app/hooks"
 import {
   registerUser,
-} from "@/components/register/registerSlice"
-import { setPage } from "@/components/appSlice";
-import { IErrorData } from "@/types/types";
-import { validateRegisterInputs } from "@/utils";
+} from "../../components/register/registerSlice"
+import { setPage } from "../../components/appSlice";
+import { IErrorData } from "../../types/types";
+import { validateRegisterInputs } from "../../utils";
 
 export const Register = () => {
   const dispatch = useAppDispatch()
@@ -37,7 +37,7 @@ export const Register = () => {
       // payload: IVaildData
       return;
     }
-    let registerResult = await dispatch(registerUser({ userId, password, nickname }));
+    const registerResult = await dispatch(registerUser({ userId, password, nickname }));
     if (registerResult.meta.requestStatus === 'fulfilled') {
       return;
     }

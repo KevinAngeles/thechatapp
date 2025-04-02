@@ -1,8 +1,23 @@
-import React from "react"
-import { createRoot } from "react-dom/client"
+import { StrictMode } from 'react';
 import { Provider } from "react-redux"
-import App from "@/App"
-import { store } from "@/app/store"
+// import * as ReactDOM from 'react-dom/client';
+import { createRoot } from "react-dom/client";
+import App from './App';
+// import App from "@/App"
+import { store } from "./app/store";
+// import { store } from "@/app/store";
+
+// const root = ReactDOM.createRoot(
+//   document.getElementById('root') as HTMLElement
+// );
+
+// root.render(
+//   <StrictMode>
+//       <Provider store={store}>
+//         <App/>
+//       </Provider>
+//     </StrictMode>
+// );
 
 const container = document.getElementById("root")
 
@@ -10,11 +25,11 @@ if (container) {
   const root = createRoot(container)
 
   root.render(
-    <React.StrictMode>
+    <StrictMode>
       <Provider store={store}>
         <App />
       </Provider>
-    </React.StrictMode>,
+    </StrictMode>,
   )
 } else {
   throw new Error(

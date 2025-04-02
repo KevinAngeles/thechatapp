@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { useAppDispatch } from '@/app/hooks';
-import { setLoggedUser, setPage } from '@/components/appSlice';
-import { IErrorData, IValidData } from '@/types/types';
-import { loginUser } from '@/components/login/loginSlice';
-import { validateLoginInputs } from '@/utils';
+import { useAppDispatch } from '../../app/hooks';
+import { setLoggedUser, setPage } from '../../components/appSlice';
+import { IErrorData, IValidData } from '../../types/types';
+import { loginUser } from '../../components/login/loginSlice';
+import { validateLoginInputs } from '../../utils';
 
 export const Login = (props: { disableCustomTheme?: boolean }) => {
     const [userId, setUserId] = useState('');
