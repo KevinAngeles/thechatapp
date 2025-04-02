@@ -1,5 +1,5 @@
 {
-  "name": "@thechatapp/express-passport-login",
+  "name": "@thechatapp/express-passport-graphql-chat",
   "version": "0.0.1",
   "description": "Server code for a chat application using JWT with Express and Passport.js to handle authentication.",
   "author": "KevinAngeles",

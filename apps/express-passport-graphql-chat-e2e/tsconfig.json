@@ -1,7 +1,7 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "out-tsc/@thechatapp2/express-passport-login-e2e",
+    "outDir": "out-tsc/@thechatapp2/express-passport-graphql-chat-e2e",
     "esModuleInterop": true,
     "noUnusedLocals": false,
     "noImplicitAny": false

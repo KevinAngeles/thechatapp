@@ -1,7 +1,7 @@
 {
-    "name": "@thechatapp/express-passport-login",
-    "root": "apps/express-passport-login",
-    "sourceRoot": "apps/express-passport-login/src",
+    "name": "@thechatapp/express-passport-graphql-chat",
+    "root": "apps/express-passport-graphql-chat",
+    "sourceRoot": "apps/express-passport-graphql-chat/src",
     "projectType": "application",
     "targets": {
       "serve": {
@@ -11,15 +11,15 @@
           "build"
         ],
         "options": {
-          "buildTarget": "@thechatapp/express-passport-login:build",
+          "buildTarget": "@thechatapp/express-passport-graphql-chat:build",
           "runBuildTargetDependencies": false
         },
         "configurations": {
           "development": {
-            "buildTarget": "@thechatapp/express-passport-login:build:development"
+            "buildTarget": "@thechatapp/express-passport-graphql-chat:build:development"
           },
           "production": {
-            "buildTarget": "@thechatapp/express-passport-login:build:production"
+            "buildTarget": "@thechatapp/express-passport-graphql-chat:build:production"
           }
         }
       },

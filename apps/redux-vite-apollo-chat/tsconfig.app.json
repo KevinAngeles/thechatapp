@@ -1,0 +1,28 @@
+{
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+      "outDir": "dist",
+      "jsx": "react-jsx",
+      "types": [
+        "vitest/globals"
+      ],
+      "rootDir": "src",
+      "tsBuildInfoFile": "dist/tsconfig.app.tsbuildinfo",
+      "paths": {
+        "@/*": ["./src/*"]
+      }
+    },
+    "include": [
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "out-tsc",
+      "dist",
+      "jest.config.ts",
+      "src/**/*.spec.ts",
+      "src/**/*.test.ts",
+      "eslint.config.js",
+      "eslint.config.cjs",
+      "eslint.config.mjs"
+    ]
+}
