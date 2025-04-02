@@ -1,0 +1,44 @@
+.button {
+    border: none; /* Remove default border */
+    border-radius: 5px; /* Rounded corners */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+    color: white; /* White text color */
+    cursor: pointer; /* Pointer cursor on hover */
+    font-size: 16px; /* Font size */
+    font-weight: bold; /* Bold text */
+    margin-bottom: 5%;
+    margin-top: 5%;
+    margin-right: 5%;
+    padding: 10px 20px; /* Padding for the button */
+    transition: background-color 0.3s ease; /* Smooth transition for background color */
+    &--active {
+        background-color: #cc5500; /* Burnt orange color */
+        &:active {
+            background-color: #993d00; /* Even darker burnt orange on click */
+        }
+        &:focus {
+            box-shadow: 0 0 0 3px rgba(204, 85, 0, 0.5); /* Custom focus outline */
+            outline: none; /* Remove default focus outline */
+        }
+        &:hover {
+            background-color: #b34700; /* Darker burnt orange on hover */
+        }
+    }
+    &--passive {
+        background-color: #c96822; /* Burnt orange color */
+        &:active {
+            background-color: #b84d06; /* Even darker burnt orange on click */
+        }
+        &:focus {
+            box-shadow: 0 0 0 3px rgba(204, 85, 0, 0.5); /* Custom focus outline */
+            outline: none; /* Remove default focus outline */
+        }
+        &:hover {
+            background-color: #b84d06; /* Darker burnt orange on hover */
+        }
+    }
+    &--disabled {
+        background-color: #808080; /* Gray color for disabled button */
+        cursor: not-allowed; /* Not-allowed cursor on disabled button */
+    }
+}

@@ -1,10 +1,10 @@
 {
-  "name": "@thechatapp/express-passport-login-e2e",
+  "name": "@thechatapp/express-passport-graphql-chat-e2e",
   "version": "0.0.1",
   "private": true,
   "nx": {
     "implicitDependencies": [
-      "@thechatapp/express-passport-login"
+      "@thechatapp/express-passport-graphql-chat"
     ],
     "targets": {
       "e2e": {
@@ -13,11 +13,11 @@
           "{projectRoot}/test-output/jest/coverage"
         ],
         "options": {
-          "jestConfig": "apps/express-passport-login-e2e/jest.config.ts",
+          "jestConfig": "apps/express-passport-graphql-chat-e2e/jest.config.ts",
           "passWithNoTests": true
         },
         "dependsOn": [
-          "@thechatapp/express-passport-login:build"
+          "@thechatapp/express-passport-graphql-chat:build"
         ]
       }
     }

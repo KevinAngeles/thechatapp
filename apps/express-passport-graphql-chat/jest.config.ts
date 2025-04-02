@@ -1,5 +1,5 @@
 export default {
-  displayName: '@thechatapp2/express-passport-login',
+  displayName: '@thechatapp2/express-passport-graphql-chat',
   preset: '../../jest.preset.js',
   testEnvironment: 'node',
   transform: {

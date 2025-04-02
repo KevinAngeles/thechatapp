@@ -1,0 +1,27 @@
+{
+  "name": "@thechatapp/redux-vite-apollo-chat",
+  "root": "apps/redux-vite-apollo-chat",
+  "sourceRoot": "apps/redux-vite-apollo-chat/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/vite:build",
+      "options": {
+        "viteConfig": "apps/redux-vite-apollo-chat/vite.config.ts",
+        "outputPath": "dist/apps/redux-vite-apollo-chat"
+      }
+    },
+    "serve": {
+      "executor": "@nx/vite:dev-server",
+      "options": {
+        "buildTarget": "@thechatapp/redux-vite-apollo-chat:build",
+        "viteConfig": "apps/redux-vite-apollo-chat/vite.config.ts"
+      }
+    },
+    "test": {
+      "options": {
+        "passWithNoTests": true
+      }
+    }
+  }
+}

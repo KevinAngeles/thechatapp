@@ -4,10 +4,13 @@
   "files": [],
   "references": [
     {
-      "path": "./apps/express-passport-login-e2e"
+      "path": "./apps/express-passport-graphql-chat-e2e"
     },
     {
-      "path": "./apps/express-passport-login"
+      "path": "./apps/express-passport-graphql-chat"
+    },
+    {
+      "path": "./apps/redux-vite-apollo-chat"
     }
   ]
 }

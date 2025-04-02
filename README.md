@@ -6,14 +6,17 @@ The Chat App is a monorepo that contains three distinct projects, each serving a
 
 ## Projects in the Monorepo
 
-### 1. **express-passport-login**
-This project is a Node.js application using Express and Passport.js to handle user authentication. It provides APIs for user login, registration, and session management, leveraging JWT for secure authentication.
+### 1. **express-passport-graphql-chat**
+This project is a Node.js application using Express, Passport.js, GraphQL, and WebSocket. It handles user authentication, GraphQL queries, mutations, and subscriptions, and real-time messaging for the chat application.
 
-- **Purpose**: Backend authentication service for the chat application.
+- **Purpose**: Backend service for authentication and real-time messaging.
 - **Key Features**:
   - User login and registration.
   - JWT-based authentication.
   - Session management with `express-session`.
+  - GraphQL API for chat messages.
+  - WebSocket server for real-time communication.
+  - Integration with Apollo Server.
 
 ---
 
@@ -28,17 +31,6 @@ This project is a frontend application built with React, Redux, and Apollo Clien
 
 ---
 
-### 3. **chat-express-graphql-ws**
-This project is a Node.js application using Express, GraphQL, and WebSocket. It provides the backend for real-time messaging, handling GraphQL queries, mutations, and subscriptions.
-
-- **Purpose**: Backend for real-time messaging.
-- **Key Features**:
-  - GraphQL API for chat messages.
-  - WebSocket server for real-time communication.
-  - Integration with Apollo Server.
-
----
-
 ## Monorepo Purpose
 The monorepo is designed to streamline the development and management of the chat application by housing all related projects in a single repository. Using Nx, developers can efficiently build, serve, and test individual projects or the entire application.
 
@@ -47,31 +39,23 @@ The monorepo is designed to streamline the development and management of the cha
 ## Available Commands
 
 ### Serve Projects Individually
-- **Serve express-passport-login**:
+- **Serve express-passport-graphql-chat**:
   ```
-  npx nx serve express-passport-login
+  npx nx serve express-passport-graphql-chat
   ```
 - **Serve redux-vite-apollo-chat**:
   ```
   npx nx serve redux-vite-apollo-chat
   ```
-- **Serve chat-express-graphql-ws**:
-  ```
-  npx nx serve chat-express-graphql-ws
-  ```
 
 ### Build Projects Individually
-- **Build express-passport-login**:
+- **Build express-passport-graphql-chat**:
   ```
-  npx nx build express-passport-login
+  npx nx build express-passport-graphql-chat
   ```
 - **Build redux-vite-apollo-chat**:
   ```
   npx nx build redux-vite-apollo-chat
-  ```
-- **Build chat-express-graphql-ws**:
-  ```
-  npx nx serve chat-express-graphql-ws
   ```
   
 ### Serve All Projects at Once
