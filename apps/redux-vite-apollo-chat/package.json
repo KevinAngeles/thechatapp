@@ -1,5 +1,7 @@
 {
   "name": "@thechatapp2/redux-vite-apollo-chat",
+  "description": "Client code for a chat application using Redux and Apollo Client with Vite.",
+  "author": "KevinAngeles",
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.13.5",
