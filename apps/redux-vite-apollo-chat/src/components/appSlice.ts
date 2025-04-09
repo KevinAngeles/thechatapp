@@ -1,12 +1,13 @@
 import { createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit"
 import { createAppSlice } from "../app/createAppSlice"
-import { isErrorData, postLogout } from "../components/AuthenticationAPI"
-import { AppSliceState } from "../types/types"
+import { isErrorData, postLogout, getCheckSession } from "../components/AuthenticationAPI"
+import { AppSliceState, ISessionData } from "../types/types"
 
 const initialState: AppSliceState = {
   page: "login",
   loggedUser: null,
-  logoutStatus: "idle"
+  logoutStatus: "idle",
+  sessionStatus: 'idle'
 }
 
 // create async thunk
@@ -20,6 +21,17 @@ export const logoutUser = createAsyncThunk(
     } else {
       console.log("Error in logout", response);
     }
+  }
+)
+
+export const checkSession = createAsyncThunk(
+  "app/checkSessionThunk",
+  async (_, thunkAPI) => {
+    const response = await getCheckSession();
+    if (isErrorData(response)) {
+      return thunkAPI.fulfillWithValue({loggedIn: false} as ISessionData);
+    }
+    return thunkAPI.fulfillWithValue(response);
   }
 )
 
@@ -43,6 +55,15 @@ export const appSlice = createAppSlice({
     })
     builder.addCase(logoutUser.rejected, (state, action) => {
       state.logoutStatus = "failed"
+    })
+    builder.addCase(checkSession.pending, (state, action) => {
+      state.sessionStatus = "loading"
+    })
+    builder.addCase(checkSession.fulfilled, (state, action) => {
+      state.sessionStatus = "idle"
+    })
+    builder.addCase(checkSession.rejected, (state, action) => {
+      state.sessionStatus = "failed"
     })
   },
   selectors: {

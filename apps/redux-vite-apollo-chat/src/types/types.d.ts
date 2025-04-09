@@ -9,6 +9,7 @@ export interface AppSliceState {
     loggedUser: IAuthenticatedUser | null;
     page: 'login' | 'register' | 'chat';
     logoutStatus: TRequestStatus;
+    sessionStatus: TRequestStatus;
 }
 
 export interface IRegisterPayload {
@@ -20,6 +21,7 @@ export interface IRegisterPayload {
 export interface ILoginPayload {
     userId: string
     password: string
+    keepLogged: boolean
 }
 
 export interface ILogoutPayload {
@@ -73,7 +75,10 @@ interface IErrorData {
         nickname?: string[];
     }
 }
-
+interface ISessionData {
+    loggedIn: boolean;
+    user ?: IAuthenticatedUser;
+}
 interface IAuthenticatedUser {
     id: string;
     nickname: string;

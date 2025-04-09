@@ -7,7 +7,7 @@ import { cookieExtractor, validateLoginInputs, validateRegisterInputs } from '..
 import { IJwtPayload } from './passport-config.d';
 import { User } from '../models/User';
 import { authentication } from '../utils/constants';
-import { IErrorData } from '../routes/auth.d';
+import { AuthenticatedUser, IErrorData } from '../routes/auth.d';
 
 const passportConfig = (passport: PassportStatic) => {
   // Local strategy for email/password authentication
@@ -170,7 +170,14 @@ const passportConfig = (passport: PassportStatic) => {
   passport.deserializeUser(async (id: any, done: any) => {
     try {
       const user = await User.findById(id);
-      done(null, user);
+      if (!user || !user.nickname || !user.userId) {
+        throw new Error('User not found');
+      }
+      const authenticatedUser: AuthenticatedUser = {
+        id: user.userId,
+        nickname: user.nickname,
+      }
+      done(null, authenticatedUser);
     } catch (err) {
       done(err);
     }

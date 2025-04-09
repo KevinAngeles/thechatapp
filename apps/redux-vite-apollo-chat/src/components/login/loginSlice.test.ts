@@ -75,7 +75,7 @@ describe('loginSlice', () => {
     const originalGlobalFetch = global.fetch;
     global.fetch = vi.fn(() => Promise.resolve(successfulResponse));
     
-    await store.dispatch(loginUser({ userId, password }));
+    await store.dispatch(loginUser({ userId, password, keepLogged: false }));
 
     const loginState = store.getState().login;
     const appState = store.getState().app;
@@ -103,7 +103,7 @@ describe('loginSlice', () => {
       json: () => Promise.reject(error),
     } as Response);
 
-    await store.dispatch(loginUser({ userId, password }));
+    await store.dispatch(loginUser({ userId, password, keepLogged: false }));
 
     const loginState = store.getState().login;
     const appState = store.getState().app;

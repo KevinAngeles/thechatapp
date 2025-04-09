@@ -1,4 +1,5 @@
 import { validateLoginInputs } from "../utils";
+import { authentication } from "./constants";
 
 describe('validateLoginInputs', () => {
   test('validateLoginInputs sets errors for invalid inputs', () => {
@@ -7,9 +8,9 @@ describe('validateLoginInputs', () => {
       password: "psw"
     };
     const loginErrorMessages = {
-      userId: 'Invalid email',
-      password: 'Password must contain at least 8 characters, including letters and numbers',
-      general: 'Invalid credentials'
+      userId: authentication.login.errorMessages.userId.invalid,
+      password: authentication.login.errorMessages.password.invalid,
+      general: authentication.login.errorMessages.general.credentials
     }
     const userId = invalidLoginInputs.userId;
     const password = invalidLoginInputs.password;

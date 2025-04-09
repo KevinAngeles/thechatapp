@@ -5,6 +5,7 @@ import bcrypt from 'bcryptjs';
 export interface IUser extends Document {
     userId: string;
     password: string;
+    nickname: string;
     comparePassword(password: string): Promise<boolean>;
 }
 

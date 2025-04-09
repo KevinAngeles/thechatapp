@@ -1,20 +1,22 @@
 {
-  "name": "@thechatapp2/redux-vite-apollo-chat",
+  "name": "@thechatapp/redux-vite-apollo-chat",
   "description": "Client code for a chat application using Redux and Apollo Client with Vite.",
   "author": "KevinAngeles",
   "private": true,
+  "type": "module",
   "dependencies": {
     "@apollo/client": "^3.13.5",
     "@reduxjs/toolkit": "^2.6.1",
-    "react": "19.0.0",
-    "react-dom": "19.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-redux": "^9.2.0"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.2.0",
-    "@testing-library/user-event": "^14.6.1",
-    "@types/react": "19.0.0",
-    "@types/react-dom": "19.0.0"
+    "@testing-library/dom": "^9.3.4",
+    "@testing-library/jest-dom": "^6.2.0",
+    "@testing-library/react": "^14.1.2",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1"
   }
 }
