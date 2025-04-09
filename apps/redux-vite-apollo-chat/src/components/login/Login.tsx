@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { useAppDispatch } from '../../app/hooks';
 import { setLoggedUser, setPage } from '../../components/appSlice';
-import { IErrorData, IValidData } from '../../types/types';
+import { IErrorData, IValidData, ILoginPayload } from '../../types/types';
 import { loginUser } from '../../components/login/loginSlice';
 import { validateLoginInputs } from '../../utils';
 
 export const Login = (props: { disableCustomTheme?: boolean }) => {
     const [userId, setUserId] = useState('');
     const [password, setPassword] = useState('');
+    const [keepLogged, setKeepLogged] = useState(false);
     const [userIdErrorMessage, setUserIdErrorMessage] = useState('');
     const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
     const [generalErrorMessage, setGeneralErrorMessage] = useState('');
@@ -28,8 +29,8 @@ export const Login = (props: { disableCustomTheme?: boolean }) => {
         setGeneralErrorMessage("");
     }
 
-    const handleLoginUser = async (userId: string, password: string) => {
-        const loginResult = await dispatch(loginUser({ userId, password }));
+    const handleLoginUser = async (userId: string, password: string, keepLogged: boolean) => {
+        const loginResult = await dispatch(loginUser({ userId, password, keepLogged } as ILoginPayload));
         if (loginResult.meta.requestStatus === 'rejected') {
             // IErrorData is a type that contains an error message
             dispatch(setLoggedUser(null));
@@ -69,11 +70,16 @@ export const Login = (props: { disableCustomTheme?: boolean }) => {
         if (!hasValidInputs) {
             return;
         }
-        await handleLoginUser(userId, password);
+        await handleLoginUser(userId, password, keepLogged);
     }
     const handleClickRegister = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         event.preventDefault();
         dispatch(setPage('register'));
+    }
+
+    const handleOnChangeKeepLogged = (event: React.ChangeEvent<HTMLInputElement>): void => {
+        event.preventDefault();
+        setKeepLogged(event.target.checked);
     }
 
     return (
@@ -111,7 +117,7 @@ export const Login = (props: { disableCustomTheme?: boolean }) => {
                 <div className="error-message" id="password-error">{passwordErrorMessage}</div>
 
                 <div className="form-checkbox">
-                    <input type="checkbox" id="keep-logged-in" className='checkbox-input' />
+                    <input type="checkbox" id="keep-logged-in" className='checkbox-input' checked={keepLogged} onChange={handleOnChangeKeepLogged} />
                     <label htmlFor="keep-logged-in" className='checkbox-label'>Keep me logged in</label>
                 </div>
                 <div className="error-message" id="general-error">{generalErrorMessage}</div>

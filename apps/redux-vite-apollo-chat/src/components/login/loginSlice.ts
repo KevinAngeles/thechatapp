@@ -10,8 +10,8 @@ const initialState: LoginSliceState = {
 
 export const loginUser = createAsyncThunk(
   "login/loginThunk",
-  async ({ userId, password }: ILoginPayload, thunkAPI) => {
-    const response = await postLogin(userId, password)
+  async ({ userId, password, keepLogged }: ILoginPayload, thunkAPI) => {
+    const response = await postLogin(userId, password, keepLogged)
     if (isErrorData(response)) {
       return thunkAPI.rejectWithValue(response);
     } else {

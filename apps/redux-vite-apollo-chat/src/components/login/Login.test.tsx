@@ -7,6 +7,7 @@ import { AppSliceState, IAuthenticatedUser, ILoginPayload, IErrorData, IValidDat
 import { Provider } from 'react-redux';
 import { makeStore } from '../../app/store';
 import { vi, describe, expect, beforeEach, afterEach } from 'vitest';
+import { authentication } from '../../utils/constants';
 
 let store: EnhancedStore<{
   login: LoginSliceState;
@@ -25,16 +26,16 @@ const mocks = vi.hoisted(() => {
   }
 });
 
-vi.mock("@/app/hooks", async (importOriginal) => {
-  const actual: any = await importOriginal();
+vi.mock("../../app/hooks", async (importOriginal) => {
+  const actual = await importOriginal() as typeof import("../../app/hooks");
   return {
     ...actual,
     useAppDispatch: () => mocks.dispatch,
   };
 });
 
-vi.mock("@/components/login/loginSlice", async (importOriginal) => {
-  const actual: any = await importOriginal();
+vi.mock("../../components/login/loginSlice", async (importOriginal) => {
+  const actual = await importOriginal() as typeof import("../../components/login/loginSlice");
   return {
     ...actual,
     loginUser: mocks.loginUser
@@ -60,11 +61,13 @@ describe('Login Component', () => {
   test('handleLoginUser sets loggedUser when clicking on login button with valid credentials for an account that actually exists', async () => {
     const validUserId = 'user@email.com';
     const validPassword = 'Password123';
+    const keepLogged = false;
     const loginUserAsyncThunkAction = {
       type: 'login/loginThunk',
       payload: {
         userId: validUserId,
-        password: validPassword
+        password: validPassword,
+        keepLogged: keepLogged
       } as ILoginPayload
     }
     const resolvedLoginUserDispatch = {
@@ -101,7 +104,7 @@ describe('Login Component', () => {
     // Inputs are valid so the loginUser action is dispatched
     // Assert first dispatch was called with loginUser action with correct payload
     await waitFor(() => {
-      expect(mocks.dispatch.mock.calls[0][0]).toStrictEqual(loginUser({userId: validUserId, password: validPassword}));
+      expect(mocks.dispatch.mock.calls[0][0]).toStrictEqual(loginUser({userId: validUserId, password: validPassword, keepLogged: keepLogged}));
     });
     // Assert second dispatch was called with setLoggedUser action with correct payload
     await waitFor(() => {
@@ -111,11 +114,13 @@ describe('Login Component', () => {
   test('handleLoginUser changes page when clicking on login button with valid credentials for an account that actually exists', async () => {  
     const validUserId = 'user@email.com';
     const validPassword = 'Password123';
+    const keepLogged = false;
     const loginUserAsyncThunkAction = {
       type: 'login/loginThunk',
       payload: {
         userId: validUserId,
-        password: validPassword
+        password: validPassword,
+        keepLogged: keepLogged
       } as ILoginPayload
     };
     const resolvedLoginUserDispatch = {
@@ -148,7 +153,7 @@ describe('Login Component', () => {
     // Inputs are valid so the loginUser action is dispatched
     // Assert first dispatch was called with loginUser action with correct payload
     await waitFor(() => {
-      expect(mocks.dispatch.mock.calls[0][0]).toStrictEqual(loginUser({userId: validUserId, password: validPassword}));
+      expect(mocks.dispatch.mock.calls[0][0]).toStrictEqual(loginUser({userId: validUserId, password: validPassword, keepLogged: keepLogged}));
     });
     // Assert third dispatch was called with setPage action with correct payload
     await waitFor(() => {
@@ -157,9 +162,9 @@ describe('Login Component', () => {
   });
   test('handleLoginUser does not set any error message when clicking on login button with valid credentials for an account that actually exists', async () => {
     const loginErrorMessages = {
-      userId: 'Invalid user ID',
-      password: 'Invalid password',
-      general: 'Invalid credentials'
+      userId: authentication.login.errorMessages.userId.invalid,
+      password: authentication.login.errorMessages.password.invalid,
+      general: authentication.login.errorMessages.general.credentials
     }
     const validUserId = 'user@email.com';
     const validPassword = 'Password123';
@@ -208,9 +213,9 @@ describe('Login Component', () => {
     const validUserId = 'user@email.com';
     const validPassword = 'Password123'; // it is a valid password but the account does not exist
     const loginErrorMessages = {
-      userId: 'Invalid email',
-      password: 'Password must contain at least 8 characters, including letters and numbers',
-      general: 'Invalid credentials'
+      userId: authentication.login.errorMessages.userId.invalid,
+      password: authentication.login.errorMessages.password.invalid,
+      general: authentication.login.errorMessages.general.credentials
     }
     const loginUserAsyncThunkAction = {
       type: 'login/loginThunk',
@@ -231,7 +236,7 @@ describe('Login Component', () => {
           password: []
         }
       } as IErrorData
-    }
+    };
     const userIdInput = screen.getByLabelText(/ID/i);
     const passwordInput = screen.getByLabelText(/Password/i);
     mocks.loginUser.mockResolvedValue(loginUserAsyncThunkAction);
@@ -257,9 +262,9 @@ describe('Login Component', () => {
     const invalidUserId = "b";
     const validPassword = "Password123";
     const loginErrorMessages = {
-      userId: 'Invalid email',
-      password: 'Password must contain at least 8 characters, including letters and numbers',
-      general: 'Invalid credentials'
+      userId: authentication.login.errorMessages.userId.invalid,
+      password: authentication.login.errorMessages.password.invalid,
+      general: authentication.login.errorMessages.general.credentials
     }
     const loginUserAsyncThunkAction = {
       type: 'login/loginThunk',
@@ -304,9 +309,9 @@ describe('Login Component', () => {
     const invalidUserId = "b";
     const validPassword = "Password123";
     const loginErrorMessages = {
-      userId: 'Invalid email',
-      password: 'Password must contain at least 8 characters, including letters and numbers',
-      general: 'Invalid credentials'
+      userId: authentication.login.errorMessages.userId.invalid,
+      password: authentication.login.errorMessages.password.invalid,
+      general: authentication.login.errorMessages.general.credentials
     }
     const loginUserAsyncThunkAction = {
       type: 'login/loginThunk',
@@ -349,9 +354,9 @@ describe('Login Component', () => {
   });
   test('handleSubmitLogin sets password error message when clicking on login button with an invalid password', async () => {
     const loginErrorMessages = {
-      userId: 'Invalid email',
-      password: 'Password must contain at least 8 characters, including letters and numbers',
-      general: 'Invalid credentials'
+      userId: authentication.login.errorMessages.userId.invalid,
+      password: authentication.login.errorMessages.password.invalid,
+      general: authentication.login.errorMessages.general.credentials
     }
     const validUserId = 'user@email.com';
     const invalidPassword = 'b';
@@ -396,9 +401,9 @@ describe('Login Component', () => {
   });
   test('handleSubmitLogin does not set general error message when clicking on the button login with an invalid password', async () => {
     const loginErrorMessages = {
-      userId: 'Invalid email',
-      password: 'Password must contain at least 8 characters, including letters and numbers',
-      general: 'Invalid credentials'
+      userId: authentication.login.errorMessages.userId.invalid,
+      password: authentication.login.errorMessages.password.invalid,
+      general: authentication.login.errorMessages.general.credentials
     }
     const validUserId = 'user@email.com';
     const invalidPassword = 'b';
@@ -443,9 +448,9 @@ describe('Login Component', () => {
   });
   test('handleSubmitLogin does not set password error message when clicking on the button login with an invalid user and a valid password', async () => {
     const loginErrorMessages = {
-      userId: 'Invalid email',
-      password: 'Password must contain at least 8 characters, including letters and numbers',
-      general: 'Invalid credentials'
+      userId: authentication.login.errorMessages.userId.invalid,
+      password: authentication.login.errorMessages.password.invalid,
+      general: authentication.login.errorMessages.general.credentials
     }
     const invalidUserId = 'b';
     const validPassword = 'Password123';
@@ -490,9 +495,9 @@ describe('Login Component', () => {
   });
   test('handleSubmitLogin does not set userId error message when clicking on the button login with a valid user and an invalid password', async () => {
     const loginErrorMessages = {
-      userId: 'Invalid email',
-      password: 'Password must contain at least 8 characters, including letters and numbers',
-      general: 'Invalid credentials'
+      userId: authentication.login.errorMessages.userId.invalid,
+      password: authentication.login.errorMessages.password.invalid,
+      general: authentication.login.errorMessages.general.credentials
     }
     const validUserId = 'user@email.com';
     const invalidPassword = 'b';
@@ -541,9 +546,9 @@ describe('Login Component', () => {
     const validPassword = 'Password123';
     const invalidUserId = 'b';
     const loginErrorMessages = {
-      userId: 'Invalid email',
-      password: 'Password must contain at least 8 characters, including letters and numbers',
-      general: 'Invalid credentials'
+      userId: authentication.login.errorMessages.userId.invalid,
+      password: authentication.login.errorMessages.password.invalid,
+      general: authentication.login.errorMessages.general.credentials
     }
     // Do the steps to display an userId error message
     const userIdInput = screen.getByLabelText(/ID/i);
@@ -573,9 +578,9 @@ describe('Login Component', () => {
     const invalidUserId = 'b';
     const invalidPassword = 'b';
     const loginErrorMessages = {
-      userId: 'Invalid email',
-      password: 'Password must contain at least 8 characters, including letters and numbers',
-      general: 'Invalid credentials'
+      userId: authentication.login.errorMessages.userId.invalid,
+      password: authentication.login.errorMessages.password.invalid,
+      general: authentication.login.errorMessages.general.credentials
     }
     const loginUserAsyncThunkAction = {
       type: 'login/loginThunk',
@@ -628,9 +633,9 @@ describe('Login Component', () => {
     const invalidUserId = 'b';
     const invalidPassword = 'b';
     const loginErrorMessages = {
-      userId: 'Invalid email',
-      password: 'Password must contain at least 8 characters, including letters and numbers',
-      general: 'Invalid credentials'
+      userId: authentication.login.errorMessages.userId.invalid,
+      password: authentication.login.errorMessages.password.invalid,
+      general: authentication.login.errorMessages.general.credentials
     }
     // Do the steps to display an userId error message
     const userIdInput = screen.getByLabelText(/ID/i);
@@ -660,9 +665,9 @@ describe('Login Component', () => {
     const validPassword = 'Password123';
     const invalidPassword = 'b';
     const loginErrorMessages = {
-      userId: 'Invalid email',
-      password: 'Password must contain at least 8 characters, including letters and numbers',
-      general: 'Invalid credentials'
+      userId: authentication.login.errorMessages.userId.invalid,
+      password: authentication.login.errorMessages.password.invalid,
+      general: authentication.login.errorMessages.general.credentials
     }
     // Do the steps to display an userId error message
     const userIdInput = screen.getByLabelText(/ID/i);
@@ -691,9 +696,9 @@ describe('Login Component', () => {
     const validPassword = 'Password123';
     const invalidPassword = 'b';
     const loginErrorMessages = {
-      userId: 'Invalid email',
-      password: 'Password must contain at least 8 characters, including letters and numbers',
-      general: 'Invalid credentials'
+      userId: authentication.login.errorMessages.userId.invalid,
+      password: authentication.login.errorMessages.password.invalid,
+      general: authentication.login.errorMessages.general.credentials
     }
     const loginUserAsyncThunkAction = {
       type: 'login/loginThunk',
@@ -746,9 +751,9 @@ describe('Login Component', () => {
     const invalidUserId = 'b';
     const invalidPassword = 'b';
     const loginErrorMessages = {
-      userId: 'Invalid email',
-      password: 'Password must contain at least 8 characters, including letters and numbers',
-      general: 'Invalid credentials'
+      userId: authentication.login.errorMessages.userId.invalid,
+      password: authentication.login.errorMessages.password.invalid,
+      general: authentication.login.errorMessages.general.credentials
     }
     // Do the steps to display an userId error message
     const userIdInput = screen.getByLabelText(/ID/i);
@@ -773,4 +778,5 @@ describe('Login Component', () => {
       expect(await screen.findByText(loginErrorMessages.userId)).toBeInTheDocument();
     });
   });
+
 });

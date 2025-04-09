@@ -6,6 +6,7 @@ import { AuthenticatedUser, AuthInfo } from './auth.d';
 import { IErrorData } from './auth.d';
 import { createTokenCookies } from '../utils';
 import { authentication } from '../utils/constants';
+import 'express-session';
 
 const router = express.Router();
 router.use(cookieParser());
@@ -20,24 +21,36 @@ router.post('/login', (req: Request, res: Response, next: NextFunction) => {
         }
     };
     try {
-        passport.authenticate('login', { session: false }, (err: Error | null | IErrorData, user: AuthenticatedUser | null, info: AuthInfo | null) => {
+        const { keepLogged }: { keepLogged: boolean } = req.body;
+        passport.authenticate('login', { session: !keepLogged }, (err: Error | null | IErrorData, user: AuthenticatedUser | null, info: AuthInfo | null) => {
             if (err || !user) {
                 errorData.message = info ? info.message : authentication.login.errorMessages.general.credentials;
                 // check if the error is of interface IErrorData
                 if ((err as IErrorData).fields) {
                     errorData.fields = (err as IErrorData).fields;
-                }                
+                }
                 errorData.status = 400;
                 return res.status(errorData.status).json(errorData);
             }
-            // Generate JWT tokens
-            const payload: { id: string; nickname: string } = { id: user.id, nickname: user.nickname };
-            createTokenCookies(jwt, payload, res);
             const userResponse: AuthenticatedUser = {
                 id: user.id,
                 nickname: user.nickname
             }
-            return res.json({ message: authentication.login.successMessages.login, user: userResponse });
+            if (keepLogged) {
+                // Generate JWT tokens
+                const payload: { id: string; nickname: string } = { id: user.id, nickname: user.nickname };
+                createTokenCookies(jwt, payload, res);
+                return res.json({ message: authentication.login.successMessages.login, user: userResponse });
+            }
+            // If not keepLogged, just return user data
+            req.login(user, (loginErr)=> {
+                if (loginErr) {
+                    errorData.message = authentication.login.errorMessages.general.internal;
+                    errorData.status = 500;
+                    return next(res.status(errorData.status).json(errorData));
+                }
+                return res.json({ message: authentication.login.successMessages.login, user: userResponse });
+            });
         })(req, res, next);
     } catch (error) {
         errorData.message = authentication.login.errorMessages.general.internal;
@@ -60,7 +73,7 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
     try {
         passport.authenticate('register', { session: false }, (err: Error | null | IErrorData, user: AuthenticatedUser | null, info: AuthInfo | null) => {
             if (err || !user) {
-                errorData.message = info ? info.message: authentication.registration.errorMessages.general.invalid;
+                errorData.message = info ? info.message : authentication.registration.errorMessages.general.invalid;
                 // check if the error is of interface IErrorData
                 if ((err as IErrorData).fields) {
                     errorData.fields = (err as IErrorData).fields;
@@ -106,7 +119,7 @@ router.post('/access-token', passport.authenticate('accessToken', { session: fal
     }
 });
 
-router.post('/refresh-token', (req: Request, res: Response, next: NextFunction) => {
+router.post('/refresh-token', (req: Request, res: Response) => {
     const errorData: IErrorData = {
         message: '',
         status: 400,
@@ -116,7 +129,7 @@ router.post('/refresh-token', (req: Request, res: Response, next: NextFunction) 
     if (!refreshToken) {
         errorData.message = authentication.refreshToken.errorMessages.notoken;
         errorData.status = 401;
-        return next(res.status(errorData.status).json(errorData));
+        return res.status(errorData.status).json(errorData);
     }
     jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET as string, (err: any, user: any) => {
         if (err) {
@@ -139,11 +152,11 @@ router.post('/refresh-token', (req: Request, res: Response, next: NextFunction) 
                 nickname: user.nickname
             }
             return res.json({ message: 'Token refreshed', user: userResponse });
-        })(req, res, next);
+        })(req, res);
     });
 });
 
-router.post('/logout', (req: Request, res: Response, next: NextFunction) => {
+router.post('/logout', (req: Request, res: Response) => {
     const errorData: IErrorData = {
         message: '',
         status: 500,
@@ -154,12 +167,29 @@ router.post('/logout', (req: Request, res: Response, next: NextFunction) => {
         res.clearCookie('refreshToken');
         res.clearCookie('accessTokenData');
         res.clearCookie('refreshTokenData');
-        return next(res.json({ message: 'Logout successful', user: null }));
+        req.logout((err) => {
+            if (err) {
+                errorData.message = authentication.logout.errorMessages.internal;
+                errorData.status = 500;
+                return res.status(errorData.status).json(errorData);
+            }
+            return res.json({ message: 'Logout successful', user: null });
+        });
+        return res.json({ message: 'Logout successful', user: null });
     } catch (error) {
         errorData.message = authentication.logout.errorMessages.internal;
         errorData.status = 500;
-        return next(res.status(errorData.status).json(errorData));
+        return res.status(errorData.status).json(errorData);
     }
+});
+
+router.get('/check-session', (req: Request, res: Response) => {
+    // check if passport session is valid
+    if (req.isAuthenticated() && req.user) {
+        const authenticatedUser = req.user as AuthenticatedUser;
+        return res.json({ loggedIn: true, user: authenticatedUser });
+    }
+    return res.json({ loggedIn: false });
 });
 
 export default router;

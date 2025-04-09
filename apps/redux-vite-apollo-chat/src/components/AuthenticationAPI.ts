@@ -1,8 +1,8 @@
-import { IErrorData, IValidData, ILoginPayload, IRegisterPayload, ILogoutPayload } from "../types/types";
+import { IErrorData, IValidData, ILoginPayload, IRegisterPayload, ILogoutPayload, ISessionData } from "../types/types";
 
 // Code for login API
 const API_LOGIN_URL = import.meta.env.VITE_API_LOGIN_URL;
-export const postLogin = async (userId: string, password: string): Promise<IValidData | IErrorData> => {
+export const postLogin = async (userId: string, password: string, keepLogged: boolean): Promise<IValidData | IErrorData> => {
   try {
     const response = await fetch(API_LOGIN_URL, {
       method: "POST",
@@ -10,7 +10,7 @@ export const postLogin = async (userId: string, password: string): Promise<IVali
         "Content-Type": "application/json",
       },
       credentials: "include", // Include cookies in the request
-      body: JSON.stringify({ userId, password } as ILoginPayload),
+      body: JSON.stringify({ userId, password, keepLogged } as ILoginPayload),
     });
     if (!response.ok) {
       const loginError: IErrorData = await response.json();
@@ -103,6 +103,27 @@ export const postRegister = async (userId: string, password: string, nickname: s
         password: [],
         nickname: []
       }
+    }
+    return errorData;
+  }
+}
+
+const API_CHECK_SESSION_URL = import.meta.env.VITE_API_CHECK_SESSION_URL;
+export const getCheckSession = async (): Promise<ISessionData | IErrorData> => {
+  try {
+    const response = await fetch(API_CHECK_SESSION_URL, {
+      method: "GET",
+      credentials: "include", // Include cookies in the request
+    });
+    if (!response.ok) {
+      throw new Error("Session check failed");
+    }
+    const data: ISessionData = await response.json();
+    return data;
+  } catch (error: any) {
+    const errorData: IErrorData = {
+      status: 500,
+      message: "Check session: Server error. Please try again later.",
     }
     return errorData;
   }
