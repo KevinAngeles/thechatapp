@@ -18,7 +18,8 @@ export const postLogin = async (userId: string, password: string, keepLogged: bo
     }
     const data: IValidData = await response.json();
     return data;
-  } catch (error: any) {
+  } catch (error: unknown) {
+    console.error('Login error:', error);
     const loginError: IErrorData = {
       status: 500,
       message: 'Login: Server error. Please try again later.',
@@ -45,7 +46,8 @@ export const postAccessToken = async (): Promise<IValidData | IErrorData> => {
     }
     const data = await response.json();
     return data;
-  } catch (error: any) {
+  } catch (error: unknown) {
+    console.error('Access token error:', error);
     const errorData: IErrorData = {
       status: 500,
       message: "Access: Server error. Please try again later.",
@@ -67,7 +69,8 @@ export const postRefreshToken = async (): Promise<IValidData | IErrorData> => {
     }
     const data: IValidData = await response.json();
     return data;
-  } catch (error: any) {
+  } catch (error: unknown) {
+    console.error('Refresh token error:', error);
     const errorData: IErrorData = {
       status: 500,
       message: "Refresh: Server error. Please try again later.",
@@ -93,7 +96,8 @@ export const postRegister = async (userId: string, password: string, nickname: s
     }
     const data: IValidData = await response.json();
     return data;
-  } catch (error: any) {
+  } catch (error: unknown) {
+    console.error('Register error:', error);
     const errorData: IErrorData = {
       status: 500,
       message: "Register: Server error. Please try again later.",
@@ -120,7 +124,8 @@ export const getCheckSession = async (): Promise<ISessionData | IErrorData> => {
     }
     const data: ISessionData = await response.json();
     return data;
-  } catch (error: any) {
+  } catch (error: unknown) {
+    console.error('Check session error:', error);
     const errorData: IErrorData = {
       status: 500,
       message: "Check session: Server error. Please try again later.",
@@ -146,7 +151,8 @@ export const postLogout = async (userId: string) => {
     }
     const data: IValidData = await response.json();
     return data;
-  } catch (error: any) {
+  } catch (error: unknown) {
+    console.error('Logout error:', error);
     const errorData: IErrorData = {
       message: "Logout: Server error. Please try again later.",
       status: 500,
@@ -155,6 +161,6 @@ export const postLogout = async (userId: string) => {
   }
 }
 
-export const isErrorData = (data: any): data is IErrorData => {
+export const isErrorData = (data: unknown): data is IErrorData => {
   return (data as IErrorData).status !== undefined;
 }
