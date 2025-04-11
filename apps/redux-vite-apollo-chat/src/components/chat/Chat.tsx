@@ -9,6 +9,8 @@ import { OnMessageSubscription, OnMessageSubscriptionVariables } from '../../typ
 import { useSelector } from 'react-redux';
 import { logoutUser, selectLoggedUser } from '../../components/appSlice';
 import { useAppDispatch } from '../../app/hooks';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBars, faXmark } from '@fortawesome/free-solid-svg-icons';
 const GRAPHQL_URL_HTTP = import.meta.env.VITE_GRAPHQL_URL_HTTP as string;
 const GRAPHQL_URL_WS = import.meta.env.VITE_GRAPHQL_URL_WS as string;
 const httpLink = new HttpLink({
@@ -66,6 +68,7 @@ const Messages = () => {
     // const { data }: QueryResult<IMessage> = useQuery(SUBSCRIBE_MESSAGES, /*{
     const [postMessage] = useMutation(POST_MESSAGE);
     const [messageChat, setMessageChat] = useState("");
+    const [showSidebar, setShowSidebar] = useState(true);
     // retrieve the user from the store using the useSelector hook
     const userChat = useSelector(selectLoggedUser);
     const { data } = useSubscription<OnMessageSubscription, OnMessageSubscriptionVariables>(MESSAGE_SUBSCRIPTION, { variables: { user: "", nickname: "" } });
@@ -116,27 +119,58 @@ const Messages = () => {
         setMessageChat(event.target.value);
     };
     
+    const handleToggleSidebar = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        event.preventDefault();
+        setShowSidebar(!showSidebar);
+    }
+    
     if (!data) {
         return null;
     }
+
     return (
-        <div className="container-chat">
+        <div className={showSidebar ? "container-chat" : "container-chat container-chat--collapsed"}>
             <div className="sidebar">
-                <div className="sidebar-header">
-                    <div className="header-logo">CH</div>
-                    <h1 className="header-title">The Chat App</h1>
-                </div>
-                <div className="sidebar-title">
-                    <div className="title-name">User List</div>
-                    <div className="title-button">X</div>
-                </div>
-                <div className="sidebar-users">
                 {
-                    extractUniqueUsers(data).map( ( nick ) => (
-                        <div className="sidebar-username" key={nick}>{nick}</div>
-                    ))
+                    showSidebar ?
+                    (
+                        <div className="sidebar-header">
+                            <div className="header-logo">CH</div>
+                            <h1 className="header-title">The Chat App</h1>
+                        </div>
+                    )
+                    :
+                    (
+                        <div className="sidebar-header show-sidebar--collapsed">
+                            <div className="header-logo">CH</div>
+                        </div>
+                    )
                 }
+                <div className="sidebar-title">
+                    {
+                        showSidebar && (<div className="title-name">User List</div>)
+                    }
+                    <div className="sidebar-button">
+                        <button className="button-toggle" title="Close chat" onClick={handleToggleSidebar}>
+                            {
+                                showSidebar
+                                    ?
+                                (<FontAwesomeIcon icon={faXmark} />)
+                                    :
+                                (<FontAwesomeIcon icon={faBars} />)
+                            }
+                        </button>
+                    </div>
                 </div>
+                {
+                    showSidebar && (<div className="sidebar-users">
+                    {
+                        extractUniqueUsers(data).map( ( nick ) => (
+                            <div className="sidebar-username" key={nick}>{nick}</div>
+                        ))
+                    }
+                    </div>)
+                }
             </div>
             <div className="main">
                 <div className="main-title">
