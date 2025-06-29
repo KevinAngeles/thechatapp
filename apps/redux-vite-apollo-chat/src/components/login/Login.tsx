@@ -78,7 +78,6 @@ export const Login = (props: { disableCustomTheme?: boolean }) => {
     }
 
     const handleOnChangeKeepLogged = (event: React.ChangeEvent<HTMLInputElement>): void => {
-        event.preventDefault();
         setKeepLogged(event.target.checked);
     }
 
