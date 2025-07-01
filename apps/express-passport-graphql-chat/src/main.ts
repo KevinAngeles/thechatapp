@@ -23,6 +23,8 @@ import { WebSocketServer } from 'ws';
 import { useServer } from 'graphql-ws/use/ws';
 import { PubSub } from 'graphql-subscriptions';
 import { Message, OnMessagesUpdatesFn, Resolvers, SubscriberFn } from './main.d';
+import { messageInputSchema } from './validation/message.schema';
+import { GraphQLError } from 'graphql';
 
 dotenv.config();
 
@@ -109,6 +111,19 @@ const resolvers: Resolvers = {
   },
   Mutation: {
     postMessage: (parent: unknown, { user, nickname, content }: { user: string; nickname: string; content: string }): number => {
+      // Validate input
+      const validation = messageInputSchema.safeParse({ user, nickname, content });
+      
+      if (!validation.success) {
+        const errorMessage = validation.error.errors
+          .map(err => `${err.path.join('.')}: ${err.message}`)
+          .join('; ');
+        throw new GraphQLError(`Validation failed: ${errorMessage}`, {
+          extensions: {
+            code: 'VALIDATION_ERROR'
+          }
+        });
+      }
       const id = messages.length;
       messages.push({
         id,
