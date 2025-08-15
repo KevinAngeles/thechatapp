@@ -1,14 +1,14 @@
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
-import express, { Request, Response, NextFunction } from 'express';
+import express, { Request, Response, NextFunction, Router } from 'express';
 import { AuthenticatedUser, AuthInfo } from './auth.d';
 import { IErrorData } from './auth.d';
 import { createTokenCookies } from '../utils';
 import { authentication } from '../utils/constants';
 import 'express-session';
 
-const router = express.Router();
+const router: Router = express.Router();
 router.use(cookieParser());
 
 router.post('/login', (req: Request, res: Response, next: NextFunction) => {
@@ -22,20 +22,22 @@ router.post('/login', (req: Request, res: Response, next: NextFunction) => {
     };
     try {
         const { keepLogged }: { keepLogged: boolean } = req.body;
-        passport.authenticate('login', { session: !keepLogged }, (err: Error | null | IErrorData, user: AuthenticatedUser | null, info: AuthInfo | null) => {
+        return passport.authenticate('login', { session: !keepLogged }, (err: Error | null | IErrorData, user: AuthenticatedUser | null, info: AuthInfo | null) => {
             if (err || !user) {
                 errorData.message = info ? info.message : authentication.login.errorMessages.general.credentials;
                 // check if the error is of interface IErrorData
-                if ((err as IErrorData).fields) {
-                    errorData.fields = (err as IErrorData).fields;
+                if (err && 'fields' in err) {
+                    errorData.fields = err.fields;
                 }
                 errorData.status = 400;
                 return res.status(errorData.status).json(errorData);
             }
+
             const userResponse: AuthenticatedUser = {
                 id: user.id,
                 nickname: user.nickname
-            }
+            };
+
             if (keepLogged) {
                 // Generate JWT tokens
                 const payload: { id: string; nickname: string } = { id: user.id, nickname: user.nickname };
@@ -43,19 +45,22 @@ router.post('/login', (req: Request, res: Response, next: NextFunction) => {
                 return res.json({ message: authentication.login.successMessages.login, user: userResponse });
             }
             // If not keepLogged, just return user data
-            req.login(user, (loginErr)=> {
+            return req.login(user, (loginErr) => {
                 if (loginErr) {
                     errorData.message = authentication.login.errorMessages.general.internal;
                     errorData.status = 500;
-                    return next(res.status(errorData.status).json(errorData));
+                    return res.status(errorData.status).json(errorData);
                 }
                 return res.json({ message: authentication.login.successMessages.login, user: userResponse });
             });
         })(req, res, next);
-    } catch (error) {
+    } catch (error: unknown) {
         errorData.message = authentication.login.errorMessages.general.internal;
         errorData.status = 500;
-        return next(res.status(errorData.status).json(errorData));
+        if (error instanceof Error) {
+            console.error('Login error:', error.message);
+        }
+        return res.status(errorData.status).json(errorData);
     }
 });
 
@@ -71,11 +76,11 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
         }
     };
     try {
-        passport.authenticate('register', { session: false }, (err: Error | null | IErrorData, user: AuthenticatedUser | null, info: AuthInfo | null) => {
+        return passport.authenticate('register', { session: false }, (err: Error | null | IErrorData, user: AuthenticatedUser | null, info: AuthInfo | null) => {
             if (err || !user) {
                 errorData.message = info ? info.message : authentication.registration.errorMessages.general.invalid;
                 // check if the error is of interface IErrorData
-                if ((err as IErrorData).fields) {
+                if ((err as IErrorData)?.fields) {
                     errorData.fields = (err as IErrorData).fields;
                 }
                 errorData.status = 400;
@@ -91,10 +96,13 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
             }
             return res.json({ message: authentication.registration.successMessages.register, user: userResponse });
         })(req, res, next);
-    } catch (error) {
+    } catch (error: unknown) {
         errorData.message = authentication.registration.errorMessages.general.internal;
         errorData.status = 500;
-        return next(res.status(errorData.status).json(errorData));
+        if (error instanceof Error) {
+            console.error('Registration error:', error.message);
+        }
+        return res.status(errorData.status).json(errorData);
     }
 });
 
@@ -111,11 +119,14 @@ router.post('/access-token', passport.authenticate('accessToken', { session: fal
             id: (req.user as AuthenticatedUser).id,
             nickname: (req.user as AuthenticatedUser).nickname
         }
-        res.json({ message: 'User verified', user: userResponse });
-    } catch (error) {
+        return res.json({ message: 'User verified', user: userResponse });
+    } catch (error: unknown) {
         errorData.message = authentication.accessToken.errorMessages.internal;
         errorData.status = 500;
-        res.status(errorData.status).json(errorData);
+        if (error instanceof Error) {
+            console.error('Access token error:', error.message);
+        }
+        return res.status(errorData.status).json(errorData);
     }
 });
 
@@ -131,7 +142,8 @@ router.post('/refresh-token', (req: Request, res: Response) => {
         errorData.status = 401;
         return res.status(errorData.status).json(errorData);
     }
-    jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET as string, (err: any, user: any) => {
+    
+    return jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET as string, (err: jwt.VerifyErrors | null, user: any) => {
         if (err) {
             errorData.message = authentication.refreshToken.errorMessages.invalid;
             errorData.status = 401;
@@ -141,7 +153,8 @@ router.post('/refresh-token', (req: Request, res: Response) => {
         // Generate new access token and refresh token
         const { newAccessToken } = createTokenCookies(jwt, payload, res);
         req.cookies.accessToken = newAccessToken;
-        passport.authenticate('accessToken', { session: false }, (err: Error | null, user: AuthenticatedUser | null, info: AuthInfo | null) => {
+        // Store the result of passport.authenticate and return it
+        return passport.authenticate('accessToken', { session: false }, (err: Error | null, user: AuthenticatedUser | null, info: AuthInfo | null) => {
             if (err || !user || !user.nickname) {
                 errorData.message = info ? info.message : 'Token refresh failed';
                 errorData.status = 400;
@@ -150,7 +163,7 @@ router.post('/refresh-token', (req: Request, res: Response) => {
             const userResponse: AuthenticatedUser = {
                 id: user.id,
                 nickname: user.nickname
-            }
+            };
             return res.json({ message: 'Token refreshed', user: userResponse });
         })(req, res);
     });
@@ -167,7 +180,7 @@ router.post('/logout', (req: Request, res: Response) => {
         res.clearCookie('refreshToken');
         res.clearCookie('accessTokenData');
         res.clearCookie('refreshTokenData');
-        req.logout((err) => {
+        return req.logout((err) => {
             if (err) {
                 errorData.message = authentication.logout.errorMessages.internal;
                 errorData.status = 500;
@@ -175,10 +188,12 @@ router.post('/logout', (req: Request, res: Response) => {
             }
             return res.json({ message: 'Logout successful', user: null });
         });
-        return res.json({ message: 'Logout successful', user: null });
-    } catch (error) {
+    } catch (error: unknown) {
         errorData.message = authentication.logout.errorMessages.internal;
         errorData.status = 500;
+        if (error instanceof Error) {
+            console.error('Logout error:', error.message);
+        }
         return res.status(errorData.status).json(errorData);
     }
 });
