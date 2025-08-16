@@ -2,9 +2,9 @@ import passport from 'passport';
 import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
 import express, { Request, Response, NextFunction, Router } from 'express';
-import { AuthenticatedUser, AuthInfo } from './auth.d';
-import { IErrorData } from './auth.d';
+import { AuthenticatedUser, AuthInfo, IErrorData } from './auth.d';
 import { createTokenCookies } from '../utils';
+import { isAuthenticatedUser } from '../utils/typeGuards';
 import { authentication } from '../utils/constants';
 import 'express-session';
 
@@ -143,8 +143,8 @@ router.post('/refresh-token', (req: Request, res: Response) => {
         return res.status(errorData.status).json(errorData);
     }
     
-    return jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET as string, (err: jwt.VerifyErrors | null, user: any) => {
-        if (err) {
+    return jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET as string, (err: jwt.VerifyErrors | null, user: unknown) => {
+        if (err || !isAuthenticatedUser(user)) {
             errorData.message = authentication.refreshToken.errorMessages.invalid;
             errorData.status = 401;
             return res.status(errorData.status).json(errorData);
