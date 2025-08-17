@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import { Request } from 'express';
 import { PassportStatic } from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
-import { Strategy as JwtStrategy } from 'passport-jwt';
+import { Strategy as JwtStrategy, VerifiedCallback } from 'passport-jwt';
 import { cookieExtractor, validateLoginInputs, validateRegisterInputs } from '../utils/index';
 import { IJwtPayload } from './passport-config.d';
 import { User } from '../models/User';
@@ -18,7 +18,7 @@ const passportConfig = (passport: PassportStatic) => {
       passwordField: 'password',
     },
     async (userId, password, done) => {
-      const errorData: IErrorData = {
+      const errorObject = {
         message: authentication.login.errorMessages.general.credentials,
         status: 400,
         fields: {
@@ -30,13 +30,14 @@ const passportConfig = (passport: PassportStatic) => {
         const {userIdMessageValidation, passwordMessageValidation} = validateLoginInputs(userId, password);
         let isValid = true;
         if (userIdMessageValidation.length > 0) {
-          errorData.fields!.userId.push(userIdMessageValidation);
+          errorObject.fields.userId.push(userIdMessageValidation);
           isValid = false;
         }
         if (passwordMessageValidation.length > 0) {
-          errorData.fields!.password.push(passwordMessageValidation);
+          errorObject.fields.password.push(passwordMessageValidation);
           isValid = false;
         }
+        const errorData: IErrorData = errorObject;
         if (!isValid) {
           return done(errorData, false, { message: authentication.login.errorMessages.general.credentials });
         }
@@ -67,7 +68,7 @@ const passportConfig = (passport: PassportStatic) => {
     },
     async (req, userId, password, done) => {
       const { nickname } = req.body;
-      const errorData: IErrorData = {
+      const errorObject = {
         message: authentication.registration.errorMessages.general.invalid,
         status: 400,
         fields: {
@@ -80,17 +81,18 @@ const passportConfig = (passport: PassportStatic) => {
         const {userIdMessageValidation, passwordMessageValidation, nicknameMessageValidation} = validateRegisterInputs(userId, password, nickname);
         let isValid = true;
         if (userIdMessageValidation.length > 0) {
-          errorData.fields!.userId.push(userIdMessageValidation);
+          errorObject.fields.userId.push(userIdMessageValidation);
           isValid = false;
         }
         if (passwordMessageValidation.length > 0) {
-          errorData.fields!.password.push(passwordMessageValidation);
+          errorObject.fields.password.push(passwordMessageValidation);
           isValid = false;
         }
         if (nicknameMessageValidation.length > 0) {
-          errorData.fields!.nickname!.push(nicknameMessageValidation);
+          errorObject.fields.nickname.push(nicknameMessageValidation);
           isValid = false;
         }
+        let errorData: IErrorData = errorObject;
         if (!isValid) {
           return done(errorData, false, { message: authentication.registration.errorMessages.general.invalid });
         }
@@ -99,11 +101,12 @@ const passportConfig = (passport: PassportStatic) => {
         const nicknameExists = await User.findOne({ nickname });
         const uniqueDataAlreadyExist = userIdxists || nicknameExists;
         if (userIdxists) {
-          errorData.fields!.userId.push(authentication.registration.errorMessages.userId.exist);
+          errorObject.fields.userId.push(authentication.registration.errorMessages.userId.exist);
         }
         if (nicknameExists) {
-          errorData.fields!.nickname!.push(authentication.registration.errorMessages.nickname.exist);
+          errorObject.fields.nickname.push(authentication.registration.errorMessages.nickname.exist);
         }
+        errorData = errorObject;
         if (uniqueDataAlreadyExist) {
           errorData.status = 400;
           return done(errorData);
@@ -124,7 +127,7 @@ const passportConfig = (passport: PassportStatic) => {
         jwtFromRequest: (req: Request) => cookieExtractor(req, 'accessToken'),
         secretOrKey: process.env.JWT_SECRET as string
       },
-      async (jwt_payload: IJwtPayload, done: any) => {
+      async (jwt_payload: IJwtPayload, done: VerifiedCallback) => {
         try {
           const user = await User.findById(jwt_payload.id);
           if (user) {
@@ -146,7 +149,7 @@ const passportConfig = (passport: PassportStatic) => {
         jwtFromRequest:  (req: Request) => cookieExtractor(req, 'refreshToken'),
         secretOrKey: process.env.JWT_SECRET as string
       },
-      async (jwt_payload: IJwtPayload, done: any) => {
+      async (jwt_payload: IJwtPayload, done: VerifiedCallback) => {
         try {
           const user = await User.findById(jwt_payload.id);
           if (user) {
