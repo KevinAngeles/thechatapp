@@ -1,13 +1,14 @@
 import bcrypt from 'bcryptjs';
 import { Request } from 'express';
 import { PassportStatic } from 'passport';
-import { Strategy as LocalStrategy } from 'passport-local';
+import { IVerifyOptions, Strategy as LocalStrategy } from 'passport-local';
 import { Strategy as JwtStrategy, VerifiedCallback } from 'passport-jwt';
 import { cookieExtractor, validateLoginInputs, validateRegisterInputs } from '../utils/index';
 import { IJwtPayload } from './passport-config.d';
 import { User } from '../models/User';
 import { authentication } from '../utils/constants';
-import { AuthenticatedUser, IErrorData } from '../routes/auth.d';
+import { IErrorData } from '../routes/auth.d';
+import { Types } from 'mongoose';
 
 const passportConfig = (passport: PassportStatic) => {
   // Local strategy for email/password authentication
@@ -17,7 +18,7 @@ const passportConfig = (passport: PassportStatic) => {
       usernameField: 'userId',
       passwordField: 'password',
     },
-    async (userId, password, done) => {
+    async (userId: string, password: string, done: (error: unknown, user?: Express.User | false, options?: IVerifyOptions) => void) => {
       const errorObject = {
         message: authentication.login.errorMessages.general.credentials,
         status: 400,
@@ -66,7 +67,7 @@ const passportConfig = (passport: PassportStatic) => {
       passwordField: 'password',
       passReqToCallback: true
     },
-    async (req, userId, password, done) => {
+    async (req: Request, userId: string, password: string, done: (error: unknown, user?: Express.User | false, options?: IVerifyOptions) => void) => {
       const { nickname } = req.body;
       const errorObject = {
         message: authentication.registration.errorMessages.general.invalid,
@@ -129,7 +130,8 @@ const passportConfig = (passport: PassportStatic) => {
       },
       async (jwt_payload: IJwtPayload, done: VerifiedCallback) => {
         try {
-          const user = await User.findById(jwt_payload.id);
+          // Find user by userId (email) instead of _id
+          const user = await User.findOne({ userId: jwt_payload.id });
           if (user) {
             return done(null, user);
           } else {
@@ -151,7 +153,8 @@ const passportConfig = (passport: PassportStatic) => {
       },
       async (jwt_payload: IJwtPayload, done: VerifiedCallback) => {
         try {
-          const user = await User.findById(jwt_payload.id);
+          // Find user by userId (email) instead of _id
+          const user = await User.findOne({ userId: jwt_payload.id });
           if (user) {
             return done(null, user);
           } else {
@@ -165,22 +168,18 @@ const passportConfig = (passport: PassportStatic) => {
   );
 
   // Serialize user to store in session
-  passport.serializeUser((user: any, done: any) => {
-    done(null, user.id);
+  passport.serializeUser<Types.ObjectId>((user: Express.User, done: (err: unknown, id?: Types.ObjectId) => void) => {
+    done(null, user._id);
   });
 
   // Deserialize user from session
-  passport.deserializeUser(async (id: any, done: any) => {
+  passport.deserializeUser<Types.ObjectId>(async (id: Types.ObjectId, done: (err: unknown, user?: Express.User | false | null) => void) => {
     try {
       const user = await User.findById(id);
       if (!user || !user.nickname || !user.userId) {
         throw new Error('User not found');
       }
-      const authenticatedUser: AuthenticatedUser = {
-        id: user.userId,
-        nickname: user.nickname,
-      }
-      done(null, authenticatedUser);
+      done(null, user);
     } catch (err) {
       done(err);
     }

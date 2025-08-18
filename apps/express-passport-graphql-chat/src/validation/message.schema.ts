@@ -1,10 +1,8 @@
 import { z } from 'zod';
 
 export const messageInputSchema = z.object({
-  user: z.string()
-    .min(3, 'Username must be at least 3 characters')
-    .max(50, 'Username must be at most 50 characters')
-    .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
+  user: z.email('Username must be a valid email address')
+    .max(50, 'Username must be at most 50 characters'),
     
   nickname: z.string()
     .min(2, 'Nickname must be at least 2 characters')

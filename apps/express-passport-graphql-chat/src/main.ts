@@ -111,29 +111,44 @@ const resolvers: Resolvers = {
   },
   Mutation: {
     postMessage: (parent: unknown, { user, nickname, content }: { user: string; nickname: string; content: string }): number => {
-      // Validate input
-      const validation = messageInputSchema.safeParse({ user, nickname, content });
-      
-      if (!validation.success) {
-        const errorMessage = validation.error.errors
-          .map(err => `${err.path.join('.')}: ${err.message}`)
-          .join('; ');
-        throw new GraphQLError(`Validation failed: ${errorMessage}`, {
+      try {
+        // Validate input
+        const validation = messageInputSchema.safeParse({ user, nickname, content });
+        
+        if (!validation.success) {
+          const errorMessage = validation.error.issues
+            .map((issue) => 
+              `${issue.path.map(String).join('.')}: ${issue.message}`
+            )
+            .join('; ');
+          throw new GraphQLError(`Validation failed: ${errorMessage}`, {
+            extensions: {
+              code: 'VALIDATION_ERROR'
+            }
+          });
+        }
+        
+        const id = messages.length;
+        messages.push({
+          id,
+          user,
+          nickname,
+          content,
+        });
+        // Notify all subscribers about the new message.
+        subscribers.forEach((fn) => fn());
+        return id;
+      } catch (error: unknown) {
+        console.error('Error in postMessage:', error);
+        if (error instanceof GraphQLError) {
+          throw error;
+        }
+        throw new GraphQLError('An unexpected error occurred', {
           extensions: {
-            code: 'VALIDATION_ERROR'
+            code: 'INTERNAL_SERVER_ERROR'
           }
         });
       }
-      const id = messages.length;
-      messages.push({
-        id,
-        user,
-        nickname,
-        content,
-      });
-      // Notify all subscribers about the new message.
-      subscribers.forEach((fn) => fn());
-      return id;
     },
   },
   Subscription: {
