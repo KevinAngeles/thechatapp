@@ -22,7 +22,7 @@ router.post('/login', (req: Request, res: Response, next: NextFunction) => {
     };
     try {
         const { keepLogged }: { keepLogged: boolean } = req.body;
-        return passport.authenticate('login', { session: !keepLogged }, (err: Error | null | IErrorData, user: AuthenticatedUser | null, info: AuthInfo | null) => {
+        return passport.authenticate('login', { session: !keepLogged }, (err: Error | null | IErrorData, user: Express.User | null, info: AuthInfo | null) => {
             if (err || !user) {
                 errorData.message = info ? info.message : authentication.login.errorMessages.general.credentials;
                 // check if the error is of interface IErrorData
@@ -34,13 +34,13 @@ router.post('/login', (req: Request, res: Response, next: NextFunction) => {
             }
 
             const userResponse: AuthenticatedUser = {
-                id: user.id,
+                id: user.userId,
                 nickname: user.nickname
             };
 
             if (keepLogged) {
                 // Generate JWT tokens
-                const payload: { id: string; nickname: string } = { id: user.id, nickname: user.nickname };
+                const payload: { id: string; nickname: string } = { id: user.userId, nickname: user.nickname };
                 createTokenCookies(jwt, payload, res);
                 return res.json({ message: authentication.login.successMessages.login, user: userResponse });
             }
@@ -76,7 +76,7 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
         }
     };
     try {
-        return passport.authenticate('register', { session: false }, (err: Error | null | IErrorData, user: AuthenticatedUser | null, info: AuthInfo | null) => {
+        return passport.authenticate('register', { session: false }, (err: Error | null | IErrorData, user: Express.User | null, info: AuthInfo | null) => {
             if (err || !user) {
                 errorData.message = info ? info.message : authentication.registration.errorMessages.general.invalid;
                 // check if the error is of interface IErrorData
@@ -88,10 +88,10 @@ router.post('/register', async (req: Request, res: Response, next: NextFunction)
             }
             // At this point, the user has been created successfully
             // Generate JWT tokens
-            const payload: { id: string; nickname: string } = { id: user.id, nickname: user.nickname };
+            const payload: { id: string; nickname: string } = { id: user.userId, nickname: user.nickname };
             createTokenCookies(jwt, payload, res);
             const userResponse: AuthenticatedUser = {
-                id: user.id,
+                id: user.userId,
                 nickname: user.nickname
             }
             return res.json({ message: authentication.registration.successMessages.register, user: userResponse });
@@ -116,8 +116,8 @@ router.post('/access-token', passport.authenticate('accessToken', { session: fal
         res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_BASE_URL as string);
         res.setHeader('Access-Control-Allow-Credentials', 'true');
         const userResponse: AuthenticatedUser = {
-            id: (req.user as AuthenticatedUser).id,
-            nickname: (req.user as AuthenticatedUser).nickname
+            id: (req.user as Express.User).userId,
+            nickname: (req.user as Express.User).nickname
         }
         return res.json({ message: 'User verified', user: userResponse });
     } catch (error: unknown) {
@@ -149,19 +149,19 @@ router.post('/refresh-token', (req: Request, res: Response) => {
             errorData.status = 401;
             return res.status(errorData.status).json(errorData);
         }
-        const payload: { id: string; nickname: string } = { id: user.id, nickname: user.nickname };
+        const payload: AuthenticatedUser = { id: user.id, nickname: user.nickname };
         // Generate new access token and refresh token
         const { newAccessToken } = createTokenCookies(jwt, payload, res);
         req.cookies.accessToken = newAccessToken;
         // Store the result of passport.authenticate and return it
-        return passport.authenticate('accessToken', { session: false }, (err: Error | null, user: AuthenticatedUser | null, info: AuthInfo | null) => {
+        return passport.authenticate('accessToken', { session: false }, (err: Error | null, user: Express.User | null, info: AuthInfo | null) => {
             if (err || !user || !user.nickname) {
                 errorData.message = info ? info.message : 'Token refresh failed';
                 errorData.status = 400;
                 return res.status(errorData.status).json(errorData);
             }
             const userResponse: AuthenticatedUser = {
-                id: user.id,
+                id: user.userId,
                 nickname: user.nickname
             };
             return res.json({ message: 'Token refreshed', user: userResponse });
@@ -201,7 +201,7 @@ router.post('/logout', (req: Request, res: Response) => {
 router.get('/check-session', (req: Request, res: Response) => {
     // check if passport session is valid
     if (req.isAuthenticated() && req.user) {
-        const authenticatedUser = req.user as AuthenticatedUser;
+        const authenticatedUser: AuthenticatedUser = {id: req.user.userId, nickname: req.user.nickname};
         return res.json({ loggedIn: true, user: authenticatedUser });
     }
     return res.json({ loggedIn: false });
