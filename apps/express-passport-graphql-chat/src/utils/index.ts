@@ -1,9 +1,9 @@
-import { Request } from 'express';
+import { Request, Response } from 'express';
 // Custom function to extract JWT from cookies
 import { JwtType } from '../routes/auth.d';
 import { authentication } from './constants';
 
-export const createTokenCookies = (jwt: JwtType, payload: { id: string, nickname: string }, res: any) => {
+export const createTokenCookies = (jwt: JwtType, payload: { id: string, nickname: string }, res: Response) => {
   res.setHeader('Access-Control-Allow-Origin', process.env.FRONTEND_BASE_URL as string);
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   const accessToken: string = jwt.sign(payload, process.env.JWT_SECRET as string, { expiresIn: '15m' });
