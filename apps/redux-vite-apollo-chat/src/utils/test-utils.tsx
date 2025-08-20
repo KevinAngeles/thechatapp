@@ -5,6 +5,7 @@ import type { PropsWithChildren, ReactElement } from "react"
 import { Provider } from "react-redux"
 import type { AppStore, RootState } from "@app/store"
 import { makeStore } from "@app/store"
+import type { RenderResult } from '@testing-library/react'
 
 /**
  * This type extends the default options for
@@ -44,10 +45,12 @@ interface ExtendedRenderOptions extends Omit<RenderOptions, "queries"> {
 export const renderWithProviders = (
   ui: ReactElement,
   extendedRenderOptions: ExtendedRenderOptions = {},
-) => {
+): RenderResult & {
+  store: AppStore
+  user: ReturnType<typeof userEvent.setup>
+} => {
   const {
     preloadedState = {},
-    // Automatically create a store instance if no store was passed in
     store = makeStore(preloadedState),
     ...renderOptions
   } = extendedRenderOptions
@@ -56,8 +59,10 @@ export const renderWithProviders = (
     <Provider store={store}>{children}</Provider>
   )
 
-  // Return an object with the store and all of RTL's query functions
+  const renderResult = render(ui, { wrapper: Wrapper, ...renderOptions })
+
   return {
+    ...renderResult,
     store,
     user: userEvent.setup(),
   }
