@@ -1,4 +1,4 @@
-import { authentication } from "./constants";
+import { authentication } from "@utils/constants";
 
 export const validateLoginInputs = (userId: string, password: string): { userIdMessageValidation: string, passwordMessageValidation: string } => {
     const userIdRegEx = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/

@@ -1,7 +1,7 @@
-import loginReducer, { loginUser } from '../../components/login/loginSlice';
-import appReducer from '../../components/appSlice';
+import loginReducer, { loginUser } from '@components/login/loginSlice';
+import appReducer from '@components/appSlice';
 import { configureStore, EnhancedStore, StoreEnhancer, ThunkDispatch, Tuple, UnknownAction } from '@reduxjs/toolkit';
-import { IErrorData, IValidData, LoginSliceState, AppSliceState } from '../../types/types';
+import { IErrorData, IValidData, LoginSliceState, AppSliceState } from '@appTypes/types';
 import { vi, describe, test, expect } from 'vitest';
 
 // function createSuccessfulFetchResponse(data: any): Response {

@@ -1,7 +1,7 @@
 import { createAsyncThunk, type PayloadAction } from "@reduxjs/toolkit"
-import { createAppSlice } from "../app/createAppSlice"
-import { isErrorData, postLogout, getCheckSession } from "../components/AuthenticationAPI"
-import { AppSliceState, ISessionData } from "../types/types"
+import { createAppSlice } from "@app/createAppSlice"
+import { isErrorData, postLogout, getCheckSession } from "@components/AuthenticationAPI"
+import { AppSliceState, ISessionData } from "@appTypes/types"
 
 const initialState: AppSliceState = {
   page: "login",

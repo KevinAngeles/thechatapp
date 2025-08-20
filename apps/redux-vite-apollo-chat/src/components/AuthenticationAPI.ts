@@ -1,4 +1,4 @@
-import { IErrorData, IValidData, ILoginPayload, IRegisterPayload, ILogoutPayload, ISessionData } from "../types/types";
+import { IErrorData, IValidData, ILoginPayload, IRegisterPayload, ILogoutPayload, ISessionData } from "@appTypes/types";
 
 // Code for login API
 const API_LOGIN_URL = import.meta.env.VITE_API_LOGIN_URL;

@@ -1,9 +1,9 @@
 import type { Action, ThunkAction } from "@reduxjs/toolkit"
 import { combineSlices, configureStore } from "@reduxjs/toolkit"
 import { setupListeners } from "@reduxjs/toolkit/query"
-import { registerSlice } from "../components/register/registerSlice"
-import { loginSlice } from "../components/login/loginSlice"
-import { appSlice } from "../components/appSlice"
+import { registerSlice } from "@components/register/registerSlice"
+import { loginSlice } from "@components/login/loginSlice"
+import { appSlice } from "@components/appSlice"
 
 // `combineSlices` automatically combines the reducers using
 // their `reducerPath`s, therefore we no longer need to call `combineReducers`.
