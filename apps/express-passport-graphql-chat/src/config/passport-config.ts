@@ -3,11 +3,11 @@ import { Request } from 'express';
 import { PassportStatic } from 'passport';
 import { IVerifyOptions, Strategy as LocalStrategy } from 'passport-local';
 import { Strategy as JwtStrategy, VerifiedCallback } from 'passport-jwt';
-import { cookieExtractor, validateLoginInputs, validateRegisterInputs } from '../utils/index';
+import { cookieExtractor, validateLoginInputs, validateRegisterInputs } from '@utils/index';
 import { IJwtPayload } from './passport-config.d';
-import { User } from '../models/User';
-import { authentication } from '../utils/constants';
-import { IErrorData } from '../routes/auth.d';
+import { User } from '@models/User';
+import { authentication } from '@utils/constants';
+import { IErrorData } from '@routes/auth.d';
 import { Types } from 'mongoose';
 
 const passportConfig = (passport: PassportStatic) => {

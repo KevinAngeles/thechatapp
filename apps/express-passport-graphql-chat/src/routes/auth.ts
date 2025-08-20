@@ -3,9 +3,9 @@ import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
 import express, { Request, Response, NextFunction, Router } from 'express';
 import { AuthenticatedUser, AuthInfo, IErrorData } from './auth.d';
-import { createTokenCookies } from '../utils';
-import { isAuthenticatedUser } from '../utils/typeGuards';
-import { authentication } from '../utils/constants';
+import { createTokenCookies } from '@utils/index';
+import { isAuthenticatedUser } from '@utils/typeGuards';
+import { authentication } from '@utils/constants';
 import 'express-session';
 
 const router: Router = express.Router();
