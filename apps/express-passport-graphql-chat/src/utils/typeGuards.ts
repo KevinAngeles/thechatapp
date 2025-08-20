@@ -1,4 +1,4 @@
-import { AuthenticatedUser } from '../routes/auth.d';
+import { AuthenticatedUser } from '@routes/auth.d';
 
 export function isAuthenticatedUser(user: unknown): user is AuthenticatedUser {
     return user !== null && 
