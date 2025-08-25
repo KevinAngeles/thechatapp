@@ -1,14 +1,14 @@
-import { Chat } from './components/chat/Chat';
-import { Login } from './components/login/Login';
-import { Register } from './components/register/Register';
-import { useAppDispatch, useAppSelector } from './app/hooks';
-import { selectPage, setPage, setLoggedUser, selectLoggedUser, checkSession } from './components/appSlice';
+import { Chat } from '@components/chat/Chat';
+import { Login } from '@components/login/Login';
+import { Register } from '@components/register/Register';
+import { useAppDispatch, useAppSelector } from '@app/hooks';
+import { selectPage, setPage, setLoggedUser, selectLoggedUser, checkSession } from '@components/appSlice';
 import { useEffect } from 'react';
-import { isErrorData, postAccessToken, postRefreshToken } from './components/AuthenticationAPI';
-import './style/app.scss';
-import './style/sign.scss';
-import './style/chat.scss';
-import { ISessionData } from './types/types';
+import { isErrorData, postAccessToken, postRefreshToken } from '@components/AuthenticationAPI';
+import '@style/app.scss';
+import '@style/sign.scss';
+import '@style/chat.scss';
+import { ISessionData } from '@appTypes/types';
 
 const getCookie = (name: string): { validUntil: Date } | null => {
   const match = document.cookie.match(`(?:(?:^|.*; *)${name} *= *([^;]*).*$)|^.*$`);

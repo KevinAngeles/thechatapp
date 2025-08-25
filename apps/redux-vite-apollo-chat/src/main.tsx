@@ -2,9 +2,9 @@ import { StrictMode } from 'react';
 import { Provider } from "react-redux"
 // import * as ReactDOM from 'react-dom/client';
 import { createRoot } from "react-dom/client";
-import App from './App';
+import App from '@src/App';
 // import App from "@/App"
-import { store } from "./app/store";
+import { store } from "@app/store";
 // import { store } from "@/app/store";
 
 // const root = ReactDOM.createRoot(

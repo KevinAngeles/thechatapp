@@ -1,13 +1,13 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { EnhancedStore, StoreEnhancer, ThunkDispatch, Tuple, UnknownAction } from '@reduxjs/toolkit';
-import { Login } from '../../components/login/Login';
-import { loginUser } from '../../components/login/loginSlice';
-import { setLoggedUser, setPage } from '../../components/appSlice';
-import { AppSliceState, IAuthenticatedUser, ILoginPayload, IErrorData, IValidData, LoginSliceState } from '../../types/types';
+import { Login } from '@components/login/Login';
+import { loginUser } from '@components/login/loginSlice';
+import { setLoggedUser, setPage } from '@components/appSlice';
+import { AppSliceState, IAuthenticatedUser, ILoginPayload, IErrorData, IValidData, LoginSliceState } from '@appTypes/types';
 import { Provider } from 'react-redux';
-import { makeStore } from '../../app/store';
+import { makeStore } from '@app/store';
 import { vi, describe, expect, beforeEach, afterEach } from 'vitest';
-import { authentication } from '../../utils/constants';
+import { authentication } from '@utils/constants';
 
 let store: EnhancedStore<{
   login: LoginSliceState;
@@ -26,16 +26,16 @@ const mocks = vi.hoisted(() => {
   }
 });
 
-vi.mock("../../app/hooks", async (importOriginal) => {
-  const actual = await importOriginal() as typeof import("../../app/hooks");
+vi.mock("@app/hooks", async (importOriginal) => {
+  const actual = await importOriginal() as typeof import("@app/hooks");
   return {
     ...actual,
     useAppDispatch: () => mocks.dispatch,
   };
 });
 
-vi.mock("../../components/login/loginSlice", async (importOriginal) => {
-  const actual = await importOriginal() as typeof import("../../components/login/loginSlice");
+vi.mock("@components/login/loginSlice", async (importOriginal) => {
+  const actual = await importOriginal() as typeof import("@components/login/loginSlice");
   return {
     ...actual,
     loginUser: mocks.loginUser

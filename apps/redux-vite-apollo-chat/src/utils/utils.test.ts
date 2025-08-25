@@ -1,5 +1,5 @@
-import { validateLoginInputs } from "../utils";
-import { authentication } from "./constants";
+import { validateLoginInputs } from "@utils/index";
+import { authentication } from "@utils/constants";
 
 describe('validateLoginInputs', () => {
   test('validateLoginInputs sets errors for invalid inputs', () => {

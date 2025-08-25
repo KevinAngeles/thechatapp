@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { useAppDispatch } from "../../app/hooks"
+import { useAppDispatch } from "@app/hooks"
 import {
   registerUser,
-} from "../../components/register/registerSlice"
-import { setPage } from "../../components/appSlice";
-import { IErrorData } from "../../types/types";
-import { validateRegisterInputs } from "../../utils";
+} from "@components/register/registerSlice"
+import { setPage } from "@components/appSlice";
+import { IErrorData } from "@appTypes/types";
+import { validateRegisterInputs } from "@utils/index";
 
 export const Register = () => {
   const dispatch = useAppDispatch()
