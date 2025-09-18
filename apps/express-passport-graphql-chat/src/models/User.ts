@@ -1,20 +1,24 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import bcrypt from 'bcryptjs';
+import { randomUUID } from 'crypto';
 
 // Define the User interface
 export interface IUser extends Document {
-    userId: string;
+    username: string; // login identifier (email or handle) - NOT exposed in tokens
     password: string;
     nickname: string;
+    publicId: string; // opaque UUID exposed to clients / JWT subject
+    tokenVersion: number; // increment to revoke all sessions
     comparePassword(password: string): Promise<boolean>;
 }
 
 const UserSchema: Schema = new Schema(
     {
-        userId: {
+        username: {
             type: String,
             required: true,
             unique: true,
+            index: true
         },
         password: {
             type: String,
@@ -25,14 +29,27 @@ const UserSchema: Schema = new Schema(
             required: true,
             unique: true,
         },
+        publicId: {
+            type: String,
+            unique: true,
+            index: true
+        },
+        // tokenVersion maps to JWT payload claim `ver` to allow global user session invalidation
+        tokenVersion: {
+            type: Number,
+            default: 0
+        }
     },
     {
         timestamps: true
     }
 );
 
-// Hash password before saving
+// Hash password before saving & ensure publicId
 UserSchema.pre<IUser>('save', async function (next) {
+    if (!this.publicId) {
+        this.publicId = randomUUID();
+    }
     if (!this.isModified('password')) {
         return next();
     }

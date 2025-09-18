@@ -1,11 +1,11 @@
-import { ApolloClient, InMemoryCache, ApolloProvider, useMutation, gql, useSubscription } from '@apollo/client';
+import { ApolloClient, InMemoryCache, ApolloProvider, useMutation, gql, useSubscription, ApolloLink } from '@apollo/client';
 import { TypedDocumentNode } from '@graphql-typed-document-node/core';
 import { useState } from 'react';
 import { split, HttpLink } from '@apollo/client';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
 import { createClient } from 'graphql-ws';
-import { OnMessageSubscription, OnMessageSubscriptionVariables } from '@appTypes/types';
+import { OnMessageSubscription } from '@appTypes/types';
 import { useSelector } from 'react-redux';
 import { logoutUser, selectLoggedUser } from '@components/appSlice';
 import { useAppDispatch } from '@app/hooks';
@@ -13,15 +13,48 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faXmark } from '@fortawesome/free-solid-svg-icons';
 const GRAPHQL_URL_HTTP = import.meta.env.VITE_GRAPHQL_URL_HTTP as string;
 const GRAPHQL_URL_WS = import.meta.env.VITE_GRAPHQL_URL_WS as string;
+// HTTP link now explicitly includes credentials so that the browser will send
+// the HTTP-only auth cookie with each GraphQL query/mutation request.
 const httpLink = new HttpLink({
-    uri: GRAPHQL_URL_HTTP
+    uri: GRAPHQL_URL_HTTP,
+    credentials: 'include'
 });
 
 const wsLink = new GraphQLWsLink(createClient({
-    url: GRAPHQL_URL_WS
-    // connectionParams: {
-    //     authToken: user.authToken,
-    // },
+    url: GRAPHQL_URL_WS,
+    // The server should authenticate the WebSocket connection using the
+    // HTTP-only cookie automatically included in the initial WS upgrade request.
+    connectionParams: async () => {
+        console.log('Creating WebSocket connection (no client-stored token/clientId).');
+        return {};
+    },
+    connectionAckWaitTimeout: 10000, // 10 seconds
+    shouldRetry: (error) => {
+        console.log('WebSocket error, retrying...', error);
+        return true;
+    },
+    retryAttempts: 5,
+    retryWait: (retries) => new Promise(resolve => 
+        setTimeout(resolve, Math.min(1000 * 2 ** retries, 10000))
+    ),
+    on: {
+        connected: () => {
+            console.log('WebSocket connected');
+        },
+        error: (err) => {
+            console.error('WebSocket error:', err);
+        },
+        closed: () => {
+            console.log('WebSocket connection closed');
+        },
+        ping: (received) => {
+            if (!received) {
+                console.log('Ping sent to server');
+            } else {
+                console.log('Pong received from server');
+            }
+        }
+    }
 }));
 
 // The split function takes three parameters:
@@ -41,15 +74,16 @@ const splitLink = split(
     httpLink,
 );
 
+// Server-side schema now derives user identity (publicId & nickname) from the
+// accessToken cookie; only 'content' is accepted as an argument.
+// Return the created message ID so the client can confirm success.
 const POST_MESSAGE = gql`
-mutation ($user: String!, $nickname: String!, $content: String!) {
-    postMessage(user: $user, nickname: $nickname, content: $content)
-}`;
+    mutation PostMessage($content: String!) {
+        postMessage(content: $content)
+    }
+`;
 
-const MESSAGE_SUBSCRIPTION: TypedDocumentNode<
-    OnMessageSubscription,
-    OnMessageSubscriptionVariables
-> = gql`
+const MESSAGE_SUBSCRIPTION: TypedDocumentNode<OnMessageSubscription> = gql`
     subscription messages {
         messages {
             id
@@ -57,38 +91,102 @@ const MESSAGE_SUBSCRIPTION: TypedDocumentNode<
             user
             nickname
         }
-}`;
+    }
+`;
 
 const client = new ApolloClient({
-    link: splitLink,
-    cache: new InMemoryCache()
+    link: ApolloLink.from([
+        new ApolloLink((operation, forward) => {
+            console.log('GraphQL operation:', operation.operationName);
+            return forward(operation);
+        }),
+        splitLink
+    ]),
+    devtools: {
+        enabled: true
+    },
+    cache: new InMemoryCache(),
+    defaultOptions: {
+        watchQuery: {
+            fetchPolicy: 'cache-and-network',
+            errorPolicy: 'all',
+        },
+        query: {
+            fetchPolicy: 'network-only',
+            errorPolicy: 'all',
+        },
+        mutate: {
+            errorPolicy: 'all',
+        },
+    },
 });
 
 const Messages = () => {
-    // const { data }: QueryResult<IMessage> = useQuery(SUBSCRIBE_MESSAGES, /*{
-    const [postMessage] = useMutation(POST_MESSAGE);
+    console.log('Rendering Messages component');
+    const dispatch = useAppDispatch();
+    const [postMessage] = useMutation(POST_MESSAGE, {
+        onError: (error) => console.error('Mutation error:', error),
+        onCompleted: (data) => console.log('Message sent:', data)
+    });
+    
     const [messageChat, setMessageChat] = useState("");
     const [showSidebar, setShowSidebar] = useState(true);
-    // retrieve the user from the store using the useSelector hook
+    const [connectionError, setConnectionError] = useState<string | null>(null);
     const userChat = useSelector(selectLoggedUser);
-    const { data } = useSubscription<OnMessageSubscription, OnMessageSubscriptionVariables>(MESSAGE_SUBSCRIPTION, { variables: { user: "", nickname: "" } });
-    const dispatch = useAppDispatch();
     
-    const extractUniqueUsers = (data: OnMessageSubscription): string[] => {
+    console.log('Current user in Chat:', userChat);
+    
+    const { data, error, loading } = useSubscription<OnMessageSubscription>(
+        MESSAGE_SUBSCRIPTION,
+        {
+            onData: ({ data }) => {
+                console.log('New subscription data:', data);
+                setConnectionError(null);
+            },
+            onError: (err) => {
+                console.error('Subscription error:', err);
+                setConnectionError('Failed to connect to chat. Please refresh the page.');
+            },
+            shouldResubscribe: true
+        }
+    );
+    
+    if (!userChat) {
+        return <div>Please log in to access the chat.</div>;
+    }
+    
+    if (loading) {
+        return <div>Connecting to chat...</div>;
+    }
+    
+    if (error || connectionError) {
+        return (
+            <div className="error-message">
+                <p>Error connecting to chat: {error?.message || connectionError}</p>
+                <button onClick={() => window.location.reload()}>Retry</button>
+            </div>
+        );
+    }
+    
+    const extractUniqueUsers = (data: OnMessageSubscription | undefined): string[] => {
         const users = new Set<string>();
         if (userChat) {
             users.add(userChat.nickname);
         }
-        data.messages.forEach(({ nickname }) => {
-            users.add(nickname);
-        });
+        if (data?.messages) {
+            data.messages.forEach(({ nickname }) => {
+                if (nickname) {
+                    users.add(nickname);
+                }
+            });
+        }
         return Array.from(users);
     }
 
     const sendMessage = () => {
-        console.log({ userChat, messageChat });
+        console.log('Sending message', { messageChat, userChatDerived: { publicId: userChat?.publicId, nickname: userChat?.nickname } });
         postMessage({
-            variables: { user: userChat?.id, nickname: userChat?.nickname, content: messageChat }
+            variables: { content: messageChat }
         });
         setMessageChat('');
     };
@@ -107,12 +205,14 @@ const Messages = () => {
 
     const handleClickLogout = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         event.preventDefault();
-        if (userChat?.id) {
-            console.log("Logging out user", userChat);
-            dispatch(logoutUser({ userId: userChat.id }));
+        // Always attempt logout: server uses cookie to identify session even if
+        // client state is stale or userChat is null.
+        if (userChat) {
+            console.log("Logging out user (local state)", userChat);
         } else {
-            console.log("Cannot logout because user is not logged in.", userChat);
+            console.warn("Logout requested with no local user; proceeding anyway (cookie-based session).");
         }
+        dispatch(logoutUser());
     }
 
     const handleMessageOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -124,10 +224,6 @@ const Messages = () => {
         setShowSidebar(!showSidebar);
     }
     
-    if (!data) {
-        return null;
-    }
-
     return (
         <div className={showSidebar ? "container-chat" : "container-chat container-chat--collapsed"}>
             <div className="sidebar">
@@ -181,15 +277,15 @@ const Messages = () => {
                 </div>
                 <div className="main-content">
                 {
-                    data.messages.map(({ id, user: messageUser, nickname, content }, index) => (
+                    data?.messages?.map(({ id, user: messageUser, nickname, content }, index) => (
                         <div className="main-card" key={id}>
-                            <div className="card-logo">{nickname.slice(0, 2).toUpperCase()}</div>
-                            <div className="card-name">{nickname}</div>
-                            <div className="card-messages">                                
+                            <div className="card-logo">{nickname?.slice(0, 2).toUpperCase()}</div>
+                            <div className="card-name">{nickname || 'Anonymous'}</div>
+                            <div className="card-messages">
                                 <div className="card-message">{content}</div>
                             </div>
                         </div>
-                    ))  
+                    ))
                 }
                 </div>
                 <div className="main-chat">

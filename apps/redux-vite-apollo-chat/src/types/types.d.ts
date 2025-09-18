@@ -13,19 +13,19 @@ export interface AppSliceState {
 }
 
 export interface IRegisterPayload {
-    userId: string
+    username: string
     password: string
     nickname: string
 }
 
 export interface ILoginPayload {
-    userId: string
+    username: string
     password: string
     keepLogged: boolean
 }
 
 export interface ILogoutPayload {
-    userId: string
+    username: string
 }
 
 export interface RequestStatus {
@@ -49,11 +49,6 @@ export interface OnMessageSubscription {
     }];
 }
 
-export interface OnMessageSubscriptionVariables {
-    user: string;
-    nickname: string;
-}
-
 export interface IMessage {
     messages: [{ _typename: string, id: string, content: string, user: string, nickname: string }]
 }
@@ -70,7 +65,7 @@ interface IErrorData {
     user?: null;
     status?: number;
     fields?: {
-        userId: string[];
+        username: string[];
         password: string[];
         nickname?: string[];
     }
@@ -80,7 +75,7 @@ interface ISessionData {
     user ?: IAuthenticatedUser;
 }
 interface IAuthenticatedUser {
-    id: string;
+    publicId: string;
     nickname: string;
 }
 interface IValidData {

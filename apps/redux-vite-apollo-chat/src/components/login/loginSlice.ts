@@ -10,12 +10,12 @@ const initialState: LoginSliceState = {
 
 export const loginUser = createAsyncThunk(
   "login/loginThunk",
-  async ({ userId, password, keepLogged }: ILoginPayload, thunkAPI) => {
-    const response = await postLogin(userId, password, keepLogged)
+  async ({ username, password, keepLogged }: ILoginPayload, thunkAPI) => {
+    const response = await postLogin(username, password, keepLogged)
     if (isErrorData(response)) {
       return thunkAPI.rejectWithValue(response);
     } else {
-      thunkAPI.dispatch(setLoggedUser({ id: response.user.id, nickname: response.user.nickname }));
+      thunkAPI.dispatch(setLoggedUser({ publicId: response.user.publicId, nickname: response.user.nickname }));
       thunkAPI.dispatch(setPage('chat'));
       return thunkAPI.fulfillWithValue(response);
     }

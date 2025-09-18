@@ -6,7 +6,7 @@
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
     "isolatedModules": true,
-    "lib": ["es2022", "dom"],
+    "lib": ["es2023", "dom"],
     "module": "NodeNext",
     "moduleResolution": "nodenext",
     "noEmitOnError": true,
@@ -16,7 +16,7 @@
     "noUnusedLocals": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "es2022",
+    "target": "es2023",
     "customConditions": ["development"]
   }
 }

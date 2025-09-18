@@ -15,23 +15,23 @@ const passportConfig = (passport: PassportStatic) => {
   passport.use(
     'login',
     new LocalStrategy({
-      usernameField: 'userId',
+      usernameField: 'username',
       passwordField: 'password',
     },
-    async (userId: string, password: string, done: (error: unknown, user?: Express.User | false, options?: IVerifyOptions) => void) => {
+    async (username: string, password: string, done: (error: unknown, user?: Express.User | false, options?: IVerifyOptions) => void) => {
       const errorObject = {
         message: authentication.login.errorMessages.general.credentials,
         status: 400,
         fields: {
-          userId: [] as string[],
+          username: [] as string[],
           password: [] as string[]
         }
       };
       try {
-        const {userIdMessageValidation, passwordMessageValidation} = validateLoginInputs(userId, password);
+        const {usernameMessageValidation, passwordMessageValidation} = validateLoginInputs(username, password);
         let isValid = true;
-        if (userIdMessageValidation.length > 0) {
-          errorObject.fields.userId.push(userIdMessageValidation);
+        if (usernameMessageValidation.length > 0) {
+          errorObject.fields.username.push(usernameMessageValidation);
           isValid = false;
         }
         if (passwordMessageValidation.length > 0) {
@@ -42,12 +42,12 @@ const passportConfig = (passport: PassportStatic) => {
         if (!isValid) {
           return done(errorData, false, { message: authentication.login.errorMessages.general.credentials });
         }
-        // If no user found with that id
-        const user = await User.findOne({ userId });
+        // If no user found with that username
+        const user = await User.findOne({ username });
         if (!user) {
           return done(errorData, false, { message: authentication.login.errorMessages.general.credentials });
         }
-        // If there is a user found with that id, check if the password is correct
+        // If there is a user found with that username, check if the password is correct
         const isMatch = await bcrypt.compare(password, user.password);
         if (isMatch) {
           return done(null, user);
@@ -63,26 +63,26 @@ const passportConfig = (passport: PassportStatic) => {
   passport.use(
     'register',
     new LocalStrategy({
-      usernameField: 'userId',
+      usernameField: 'username',
       passwordField: 'password',
       passReqToCallback: true
     },
-    async (req: Request, userId: string, password: string, done: (error: unknown, user?: Express.User | false, options?: IVerifyOptions) => void) => {
+    async (req: Request, username: string, password: string, done: (error: unknown, user?: Express.User | false, options?: IVerifyOptions) => void) => {
       const { nickname } = req.body;
       const errorObject = {
         message: authentication.registration.errorMessages.general.invalid,
         status: 400,
         fields: {
-          userId: [] as string[],
+          username: [] as string[],
           password: [] as string[],
           nickname: [] as string[],
         }
       }
       try {
-        const {userIdMessageValidation, passwordMessageValidation, nicknameMessageValidation} = validateRegisterInputs(userId, password, nickname);
+        const {usernameMessageValidation, passwordMessageValidation, nicknameMessageValidation} = validateRegisterInputs(username, password, nickname);
         let isValid = true;
-        if (userIdMessageValidation.length > 0) {
-          errorObject.fields.userId.push(userIdMessageValidation);
+        if (usernameMessageValidation.length > 0) {
+          errorObject.fields.username.push(usernameMessageValidation);
           isValid = false;
         }
         if (passwordMessageValidation.length > 0) {
@@ -98,11 +98,11 @@ const passportConfig = (passport: PassportStatic) => {
           return done(errorData, false, { message: authentication.registration.errorMessages.general.invalid });
         }
         // Verify that the user id or nickname do not already exist
-        const userIdxists = await User.findOne({ userId });
+        const userIdxists = await User.findOne({ username });
         const nicknameExists = await User.findOne({ nickname });
         const uniqueDataAlreadyExist = userIdxists || nicknameExists;
         if (userIdxists) {
-          errorObject.fields.userId.push(authentication.registration.errorMessages.userId.exist);
+          errorObject.fields.username.push(authentication.registration.errorMessages.username.exist);
         }
         if (nicknameExists) {
           errorObject.fields.nickname.push(authentication.registration.errorMessages.nickname.exist);
@@ -112,8 +112,8 @@ const passportConfig = (passport: PassportStatic) => {
           errorData.status = 400;
           return done(errorData);
         }
-        // neither user id or nickname exist, so create a new user
-        const user = await User.create({ userId, password, nickname });
+        // neither username nor nickname exist, so create a new user
+        const user = await User.create({ username, password, nickname });
         return done(null, user);
       } catch (error) {
         return done(error);
@@ -126,17 +126,25 @@ const passportConfig = (passport: PassportStatic) => {
     new JwtStrategy(
       {
         jwtFromRequest: (req: Request) => cookieExtractor(req, 'accessToken'),
-        secretOrKey: process.env.JWT_SECRET as string
+        secretOrKey: process.env.JWT_SECRET as string,
+        ignoreExpiration: false
       },
       async (jwt_payload: IJwtPayload, done: VerifiedCallback) => {
         try {
-          // Find user by userId (email) instead of _id
-          const user = await User.findOne({ userId: jwt_payload.id });
-          if (user) {
-            return done(null, user);
-          } else {
+          // Basic claim validation
+            if (jwt_payload.iss !== (process.env.JWT_ISSUER || 'thechatapp') || jwt_payload.aud !== (process.env.JWT_AUDIENCE || 'thechatapp')) {
+              return done(null, false);
+            }
+          // Find user by publicId (subject)
+          const user = await User.findOne({ publicId: jwt_payload.sub });
+          if (!user) {
             return done(null, false);
           }
+          // Token version match
+          if (user.tokenVersion !== jwt_payload.ver) {
+            return done(null, false);
+          }
+          return done(null, user);
         } catch (error) {
           return done(error, false);
         }
@@ -149,17 +157,18 @@ const passportConfig = (passport: PassportStatic) => {
     new JwtStrategy(
       {
         jwtFromRequest:  (req: Request) => cookieExtractor(req, 'refreshToken'),
-        secretOrKey: process.env.JWT_SECRET as string
+        secretOrKey: process.env.JWT_REFRESH_SECRET as string,
+        ignoreExpiration: false
       },
       async (jwt_payload: IJwtPayload, done: VerifiedCallback) => {
         try {
-          // Find user by userId (email) instead of _id
-          const user = await User.findOne({ userId: jwt_payload.id });
-          if (user) {
-            return done(null, user);
-          } else {
+          if (jwt_payload.iss !== (process.env.JWT_ISSUER || 'thechatapp') || jwt_payload.aud !== (process.env.JWT_AUDIENCE || 'thechatapp')) {
             return done(null, false);
           }
+          const user = await User.findOne({ publicId: jwt_payload.sub });
+          if (!user) return done(null, false);
+          if (user.tokenVersion !== jwt_payload.ver) return done(null, false);
+          return done(null, user);
         } catch (error) {
           return done(error, false);
         }
@@ -176,7 +185,7 @@ const passportConfig = (passport: PassportStatic) => {
   passport.deserializeUser<Types.ObjectId>(async (id: Types.ObjectId, done: (err: unknown, user?: Express.User | false | null) => void) => {
     try {
       const user = await User.findById(id);
-      if (!user || !user.nickname || !user.userId) {
+      if (!user || !user.nickname || !user.username) {
         throw new Error('User not found');
       }
       done(null, user);

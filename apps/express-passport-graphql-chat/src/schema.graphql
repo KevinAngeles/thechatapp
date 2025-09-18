@@ -1,0 +1,33 @@
+type Message {
+  id: ID!
+  user: String!
+  nickname: String!
+  content: String!
+}
+
+enum ConnectionEventType {
+  CONNECTED
+  DISCONNECTED
+}
+
+type ConnectionEvent {
+  type: ConnectionEventType!
+  sessionId: String!
+  publicId: String!
+  nickname: String!
+  timestamp: String!
+}
+
+type Query {
+  messages: [Message!]
+  connectedClients: [String!]!
+}
+
+type Mutation {
+  postMessage(content: String!): ID!
+}
+
+type Subscription {
+  messages: [Message!]
+  connectionEvents: ConnectionEvent!
+}

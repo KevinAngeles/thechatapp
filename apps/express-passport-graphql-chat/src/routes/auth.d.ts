@@ -7,7 +7,7 @@ export interface AuthInfo {
 }
 
 export interface AuthenticatedUser {
-    id: string;
+    publicId: string;
     nickname: string;
 }
 
@@ -16,7 +16,7 @@ export interface IErrorData {
     user?: null;
     status?: number; 
     fields?: {
-        userId: string[];
+        username: string[];
         password: string[];
         nickname?: string[];
     }

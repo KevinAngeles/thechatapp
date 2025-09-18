@@ -9,20 +9,20 @@ import { validateRegisterInputs } from "@utils/index";
 
 export const Register = () => {
   const dispatch = useAppDispatch()
-  const [userIdErrorMessage, setUserIdErrorMessage] = useState("")
+  const [usernameErrorMessage, setUsernameErrorMessage] = useState("")
   const [passwordErrorMessage, setPasswordErrorMessage] = useState("")
   const [nicknameErrorMessage, setNicknameErrorMessage] = useState("")
   const [generalErrorMessage, setGeneralErrorMessage] = useState("")
-  const [userId, setUserId] = useState("")
+  const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [nickname, setNickname] = useState("")
   
   const handleSubmitRegister = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     let isValid = true;
-    const {userIdMessageValidation, passwordMessageValidation, nicknameMessageValidation} = validateRegisterInputs(userId, password, nickname);
-    if (userIdMessageValidation.length > 0) {
-      setUserIdErrorMessage(userIdMessageValidation)
+    const {usernameMessageValidation, passwordMessageValidation, nicknameMessageValidation} = validateRegisterInputs(username, password, nickname);
+    if (usernameMessageValidation.length > 0) {
+      setUsernameErrorMessage(usernameMessageValidation)
       isValid = false;
     }
     if (passwordMessageValidation.length > 0) {
@@ -34,10 +34,10 @@ export const Register = () => {
       isValid = false;
     }
     if (!isValid) {
-      // payload: IVaildData
+      // payload: IValidData
       return;
     }
-    const registerResult = await dispatch(registerUser({ userId, password, nickname }));
+    const registerResult = await dispatch(registerUser({ username, password, nickname }));
     if (registerResult.meta.requestStatus === 'fulfilled') {
       return;
     }
@@ -46,12 +46,12 @@ export const Register = () => {
     if (!fields) {
       return;
     }
-    if (fields.userId.length === 0 && fields.password.length === 0 && (fields.nickname && fields.nickname.length === 0)) {
+    if (fields.username.length === 0 && fields.password.length === 0 && (fields.nickname && fields.nickname.length === 0)) {
       setGeneralErrorMessage((registerResult.payload as IErrorData).message);
       return;
     }
-    if (fields.userId.length > 0) {
-      setUserIdErrorMessage(fields.userId.join(', '))
+    if (fields.username.length > 0) {
+      setUsernameErrorMessage(fields.username.join(', '))
     }
     if (fields.password.length > 0) {
       setPasswordErrorMessage(fields.password.join(', '))
@@ -61,8 +61,8 @@ export const Register = () => {
     }
   }
   const handleEmailOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setUserId(event.target.value);
-    setUserIdErrorMessage("");
+    setUsername(event.target.value);
+    setUsernameErrorMessage("");
     setGeneralErrorMessage("");
   }
   const handlePasswordOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,14 +86,14 @@ export const Register = () => {
                 <input 
                   type="email"
                   id="user-id"
-                  className={(userIdErrorMessage.length > 0) ? 'text-input input-error':'text-input'}
-                  value={userId}
+                  className={(usernameErrorMessage.length > 0) ? 'text-input input-error':'text-input'}
+                  value={username}
                   onChange={handleEmailOnChange}
                   placeholder="your@email.com"
                   required
                 />
             </div>
-            <div className="error-message" id="user-id-error">{userIdErrorMessage}</div>
+            <div className="error-message" id="user-id-error">{usernameErrorMessage}</div>
 
             <div className="form-text">
               <label htmlFor="password" className='text-label'>Password</label>

@@ -25,59 +25,22 @@ export default function App(props: { disableCustomTheme?: boolean }) {
   const dispatch = useAppDispatch();
   useEffect(() => {
     const fetchData = async () => {
-      const accessTokenData = getCookie('accessTokenData');
-      if (!accessTokenData) {
-        // no access token
-        const response = await dispatch(checkSession());
-        const {loggedIn, user} = response.payload as ISessionData;
-        if (loggedIn && user) {
-          // valid session
-          dispatch(setPage('chat'));
-          dispatch(setLoggedUser(user));
-        }
-        return;
-      }
-      const validAccessUntil = new Date(accessTokenData.validUntil);
-      const currentDate = new Date();
-      if (currentDate < validAccessUntil) {
-        const accessResult = await postAccessToken();
-        if (!isErrorData(accessResult)) {
-          // valid access token
-          dispatch(setPage('chat'));
-          dispatch(setLoggedUser(accessResult.user));
-          dispatch(setLoggedUser({ id: accessResult?.user.id, nickname: accessResult?.user.nickname }));
-          return;
-        }
-      }
-      const refreshTokenData = getCookie('refreshTokenData');
-      if (!refreshTokenData) {
-        // no refresh token;
-        const response = await dispatch(checkSession());
-        const {loggedIn, user} = response.payload as ISessionData;
-        if (loggedIn && user) {
-          // valid session
-          dispatch(setPage('chat'));
-          dispatch(setLoggedUser(user));
-        }
-        return;
-      }
-      const validRefreshUntil = new Date(refreshTokenData.validUntil);
-      if (currentDate >= validRefreshUntil) {
-        // refresh token expired
-        return;
-      }
-      const refreshResult = await postRefreshToken();
-      if (!isErrorData(refreshResult)) {
-        // valid refresh request
+      const response = await dispatch(checkSession());
+      const {loggedIn, user} = response.payload as ISessionData;
+      if (loggedIn && user) {
+        // valid session
         dispatch(setPage('chat'));
-        dispatch(setLoggedUser({ id: refreshResult.user.id, nickname: refreshResult.user.nickname }));
-      } else {
-        // refresh request forbidden
+        dispatch(setLoggedUser(user));
+        return;
+      }
+      if (!loggedIn) {
+        // no session
         dispatch(setPage('login'));
         dispatch(setLoggedUser(null));
+        return;
       }
     }
-    fetchData();
+    fetchData().catch(console.error);
   }, [dispatch]);
   return (
     LOGGED_USER ? (

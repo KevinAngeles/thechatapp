@@ -1,13 +1,11 @@
 import { z } from 'zod';
 
+/**
+ * Validation schema for posting a chat message.
+ * Identity (publicId, nickname, sessionId) is now derived exclusively from the
+ * verified accessToken cookie in the GraphQL context. Only validate message content.
+ */
 export const messageInputSchema = z.object({
-  user: z.email('Username must be a valid email address')
-    .max(50, 'Username must be at most 50 characters'),
-    
-  nickname: z.string()
-    .min(2, 'Nickname must be at least 2 characters')
-    .max(30, 'Nickname must be at most 30 characters'),
-    
   content: z.string()
     .min(1, 'Message cannot be empty')
     .max(1000, 'Message must be at most 1000 characters')

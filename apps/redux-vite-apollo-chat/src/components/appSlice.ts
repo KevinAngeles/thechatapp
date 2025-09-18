@@ -13,10 +13,10 @@ const initialState: AppSliceState = {
 // create async thunk
 export const logoutUser = createAsyncThunk(
   "logout",
-  async ({ userId }: {userId: string}, thunkAPI) => {
-    const response = await postLogout(userId)
+  async (_, thunkAPI) => {
+    const response = await postLogout();
     if (!isErrorData(response)) {
-      thunkAPI.dispatch(setPage('login'))
+      thunkAPI.dispatch(setPage('login'));
       thunkAPI.dispatch(setLoggedUser(null));
     } else {
       console.log("Error in logout", response);

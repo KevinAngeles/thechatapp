@@ -6,19 +6,19 @@ import { loginUser } from '@components/login/loginSlice';
 import { validateLoginInputs } from '@utils/index';
 
 export const Login = (props: { disableCustomTheme?: boolean }) => {
-    const [userId, setUserId] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [keepLogged, setKeepLogged] = useState(false);
-    const [userIdErrorMessage, setUserIdErrorMessage] = useState('');
+    const [usernameErrorMessage, setUsernameErrorMessage] = useState('');
     const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
     const [generalErrorMessage, setGeneralErrorMessage] = useState('');
 
     const dispatch = useAppDispatch();
 
-    const handleUserIdOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleUsernameOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         event.preventDefault();
-        setUserId(event.target.value);
-        setUserIdErrorMessage("");
+        setUsername(event.target.value);
+        setUsernameErrorMessage("");
         setGeneralErrorMessage("");
     }
 
@@ -29,8 +29,8 @@ export const Login = (props: { disableCustomTheme?: boolean }) => {
         setGeneralErrorMessage("");
     }
 
-    const handleLoginUser = async (userId: string, password: string, keepLogged: boolean) => {
-        const loginResult = await dispatch(loginUser({ userId, password, keepLogged } as ILoginPayload));
+    const handleLoginUser = async (username: string, password: string, keepLogged: boolean) => {
+        const loginResult = await dispatch(loginUser({ username, password, keepLogged } as ILoginPayload));
         if (loginResult.meta.requestStatus === 'rejected') {
             // IErrorData is a type that contains an error message
             dispatch(setLoggedUser(null));
@@ -38,30 +38,30 @@ export const Login = (props: { disableCustomTheme?: boolean }) => {
             if (!fields) {
                 return;
             }
-            if (fields.userId.length === 0 && fields.password.length === 0) {
+            if (fields.username.length === 0 && fields.password.length === 0) {
                 setGeneralErrorMessage((loginResult.payload as IErrorData).message);
                 return;
             }
-            if (fields.userId.length > 0) {
-                setUserIdErrorMessage(fields.userId.join(', '))
+            if (fields.username.length > 0) {
+                setUsernameErrorMessage(fields.username.join(', '))
             }
             if (fields.password.length > 0) {
                 setPasswordErrorMessage(fields.password.join(', '))
             }
         } else {
             // IValidData is a type that contains a user object
-            dispatch(setLoggedUser({ id: (loginResult.payload as IValidData).user.id, nickname: (loginResult.payload as IValidData).user.nickname }));
+            dispatch(setLoggedUser({ publicId: (loginResult.payload as IValidData).user.publicId, nickname: (loginResult.payload as IValidData).user.nickname }));
             dispatch(setPage('chat'));
         }
     }
 
     const handleSubmitLogin = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const { userIdMessageValidation, passwordMessageValidation } = validateLoginInputs(userId, password);
+        const { usernameMessageValidation, passwordMessageValidation } = validateLoginInputs(username, password);
         let hasValidInputs = true;
-        if (userIdMessageValidation.length > 0) {
+        if (usernameMessageValidation.length > 0) {
             hasValidInputs = false;
-            setUserIdErrorMessage(userIdMessageValidation);
+            setUsernameErrorMessage(usernameMessageValidation);
         }
         if (passwordMessageValidation.length > 0) {
             hasValidInputs = false;
@@ -70,7 +70,7 @@ export const Login = (props: { disableCustomTheme?: boolean }) => {
         if (!hasValidInputs) {
             return;
         }
-        await handleLoginUser(userId, password, keepLogged);
+        await handleLoginUser(username, password, keepLogged);
     }
     const handleClickRegister = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         event.preventDefault();
@@ -92,14 +92,14 @@ export const Login = (props: { disableCustomTheme?: boolean }) => {
                     <input
                         type="text"
                         id="user-id"
-                        className={(userIdErrorMessage.length > 0) ? 'text-input error-input' : 'text-input'}
-                        value={userId}
-                        onChange={handleUserIdOnChange}
+                        className={(usernameErrorMessage.length > 0) ? 'text-input error-input' : 'text-input'}
+                        value={username}
+                        onChange={handleUsernameOnChange}
                         placeholder="your@email.com"
                         required
                     />
                 </div>
-                <div className="error-message" id="user-id-error">{userIdErrorMessage}</div>
+                <div className="error-message" id="user-id-error">{usernameErrorMessage}</div>
 
                 <div className="form-text">
                     <label htmlFor="password" className='text-label'>Password</label>

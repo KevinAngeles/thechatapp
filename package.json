@@ -1,9 +1,10 @@
 {
   "name": "@thechatapp/source",
-  "version": "0.0.19",
+  "version": "0.0.20",
   "license": "MIT",
   "scripts": {
-    "start": "nx run-many --target=serve --all"
+    "start": "nx run-many --target=serve --all",
+    "codegen": "graphql-codegen --config codegen.yml"
   },
   "private": true,
   "workspaces": [
@@ -11,7 +12,8 @@
     "apps/*"
   ],
   "dependencies": {
-    "@apollo/server": "^4.12.2",
+    "@apollo/server": "^5.0.0",
+    "@as-integrations/express4": "^1.1.2",
     "axios": "^1.11.0",
     "dotenv": "^17.2.1",
     "express": "4.21.2",
@@ -45,6 +47,9 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^24.3.0",
     "@types/ws": "^8.18.1",
+    "@graphql-codegen/cli": "^5.0.2",
+    "@graphql-codegen/typescript": "^4.0.7",
+    "@graphql-codegen/typescript-resolvers": "^4.0.9",
     "@vitejs/plugin-react": "^5.0.0",
     "@vitest/coverage-v8": "^3.2.4",
     "@vitest/ui": "^3.2.4",

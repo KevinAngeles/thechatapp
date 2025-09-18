@@ -59,13 +59,13 @@ describe('Login Component', () => {
   });
 
   test('handleLoginUser sets loggedUser when clicking on login button with valid credentials for an account that actually exists', async () => {
-    const validUserId = 'user@email.com';
+    const validUsername = 'user@email.com';
     const validPassword = 'Password123';
     const keepLogged = false;
     const loginUserAsyncThunkAction = {
       type: 'login/loginThunk',
       payload: {
-        userId: validUserId,
+        username: validUsername,
         password: validPassword,
         keepLogged: keepLogged
       } as ILoginPayload
@@ -75,25 +75,25 @@ describe('Login Component', () => {
       payload: {
         message: 'access granted',
         user: {
-          id: 'user@email.com',
+          publicId: 'user@email.com',
           nickname: 'testuser'
         } as IAuthenticatedUser
       } as IValidData
     };
     const authenticatedUserResponse: IAuthenticatedUser = {
-      id: 'user@email.com',
+      publicId: 'user@email.com',
       nickname: 'testuser'
     }
     mocks.loginUser.mockResolvedValue(loginUserAsyncThunkAction);
     mocks.dispatch.mockReturnValue(await Promise.resolve(resolvedLoginUserDispatch));
     // Simulate user input
-    const userIdInput = screen.getByLabelText(/ID/i);
+    const usernameInput = screen.getByLabelText(/ID/i);
     const passwordInput = screen.getByLabelText(/Password/i);
 
-    fireEvent.change(userIdInput, { target: { value: validUserId } });
+    fireEvent.change(usernameInput, { target: { value: validUsername } });
     fireEvent.change(passwordInput, { target: { value: validPassword } });
     await waitFor(() => {
-      expect(userIdInput).toHaveValue(validUserId);
+      expect(usernameInput).toHaveValue(validUsername);
       expect(passwordInput).toHaveValue(validPassword);
     });
     fireEvent.click(screen.getByRole('button', { name: /Login/i }));
@@ -104,7 +104,7 @@ describe('Login Component', () => {
     // Inputs are valid so the loginUser action is dispatched
     // Assert first dispatch was called with loginUser action with correct payload
     await waitFor(() => {
-      expect(mocks.dispatch.mock.calls[0][0]).toStrictEqual(loginUser({userId: validUserId, password: validPassword, keepLogged: keepLogged}));
+      expect(mocks.dispatch.mock.calls[0][0]).toStrictEqual(loginUser({username: validUsername, password: validPassword, keepLogged: keepLogged}));
     });
     // Assert second dispatch was called with setLoggedUser action with correct payload
     await waitFor(() => {
@@ -112,13 +112,13 @@ describe('Login Component', () => {
     });
   });
   test('handleLoginUser changes page when clicking on login button with valid credentials for an account that actually exists', async () => {  
-    const validUserId = 'user@email.com';
+    const validUsername = 'user@email.com';
     const validPassword = 'Password123';
     const keepLogged = false;
     const loginUserAsyncThunkAction = {
       type: 'login/loginThunk',
       payload: {
-        userId: validUserId,
+        username: validUsername,
         password: validPassword,
         keepLogged: keepLogged
       } as ILoginPayload
@@ -128,7 +128,7 @@ describe('Login Component', () => {
       payload: {
         message: 'access granted',
         user: {
-          id: 'user@email.com',
+          publicId: 'user@email.com',
           nickname: 'testuser'
         } as IAuthenticatedUser
       } as IValidData
@@ -136,13 +136,13 @@ describe('Login Component', () => {
     mocks.loginUser.mockResolvedValue(loginUserAsyncThunkAction);
     mocks.dispatch.mockReturnValue(await Promise.resolve(resolvedLoginUserDispatch));
     // Simulate user input
-    const userIdInput = screen.getByLabelText(/ID/i);
+    const usernameInput = screen.getByLabelText(/ID/i);
     const passwordInput = screen.getByLabelText(/Password/i);
 
-    fireEvent.change(userIdInput, { target: { value: validUserId } });
+    fireEvent.change(usernameInput, { target: { value: validUsername } });
     fireEvent.change(passwordInput, { target: { value: validPassword } });
     await waitFor(() => {
-      expect(userIdInput).toHaveValue(validUserId);
+      expect(usernameInput).toHaveValue(validUsername);
       expect(passwordInput).toHaveValue(validPassword);
     });
     fireEvent.click(screen.getByRole('button', { name: /Login/i }));
@@ -153,7 +153,7 @@ describe('Login Component', () => {
     // Inputs are valid so the loginUser action is dispatched
     // Assert first dispatch was called with loginUser action with correct payload
     await waitFor(() => {
-      expect(mocks.dispatch.mock.calls[0][0]).toStrictEqual(loginUser({userId: validUserId, password: validPassword, keepLogged: keepLogged}));
+      expect(mocks.dispatch.mock.calls[0][0]).toStrictEqual(loginUser({username: validUsername, password: validPassword, keepLogged: keepLogged}));
     });
     // Assert third dispatch was called with setPage action with correct payload
     await waitFor(() => {
@@ -162,16 +162,16 @@ describe('Login Component', () => {
   });
   test('handleLoginUser does not set any error message when clicking on login button with valid credentials for an account that actually exists', async () => {
     const loginErrorMessages = {
-      userId: authentication.login.errorMessages.userId.invalid,
+      username: authentication.login.errorMessages.username.invalid,
       password: authentication.login.errorMessages.password.invalid,
       general: authentication.login.errorMessages.general.credentials
     }
-    const validUserId = 'user@email.com';
+    const validUsername = 'user@email.com';
     const validPassword = 'Password123';
     const loginUserAsyncThunkAction = {
       type: 'login/loginThunk',
       payload: {
-        userId: validUserId,
+        username: validUsername,
         password: validPassword
       } as ILoginPayload
     }
@@ -180,7 +180,7 @@ describe('Login Component', () => {
       payload: {
         message: 'access granted',
         user: {
-          id: 'user@email.com',
+          publicId: 'user@email.com',
           nickname: 'testuser'
         } as IAuthenticatedUser
       } as IValidData
@@ -188,13 +188,13 @@ describe('Login Component', () => {
     mocks.loginUser.mockResolvedValue(loginUserAsyncThunkAction);
     mocks.dispatch.mockReturnValue(await Promise.resolve(resolvedLoginUserDispatch));
     // Simulate user input
-    const userIdInput = screen.getByLabelText(/ID/i);
+    const usernameInput = screen.getByLabelText(/ID/i);
     const passwordInput = screen.getByLabelText(/Password/i);
 
-    fireEvent.change(userIdInput, { target: { value: validUserId } });
+    fireEvent.change(usernameInput, { target: { value: validUsername } });
     fireEvent.change(passwordInput, { target: { value: validPassword } });
     await waitFor(() => {
-      expect(userIdInput).toHaveValue(validUserId);
+      expect(usernameInput).toHaveValue(validUsername);
       expect(passwordInput).toHaveValue(validPassword);
     });
     fireEvent.click(screen.getByRole('button', { name: /Login/i }));
@@ -204,27 +204,27 @@ describe('Login Component', () => {
     });
     // Assert there is not any error message
     await waitFor(() => {
-      expect(screen.queryByText(loginErrorMessages.userId)).not.toBeInTheDocument();
+      expect(screen.queryByText(loginErrorMessages.username)).not.toBeInTheDocument();
       expect(screen.queryByText(loginErrorMessages.password)).not.toBeInTheDocument();
       expect(screen.queryByText(loginErrorMessages.general)).not.toBeInTheDocument();
     });
   });
   test('handleLoginUser sets general error message when clicking on login button with valid inputs but account does not exist', async () => {
-    const validUserId = 'user@email.com';
+    const validUsername = 'user@email.com';
     const validPassword = 'Password123'; // it is a valid password but the account does not exist
     const loginErrorMessages = {
-      userId: authentication.login.errorMessages.userId.invalid,
+      username: authentication.login.errorMessages.username.invalid,
       password: authentication.login.errorMessages.password.invalid,
       general: authentication.login.errorMessages.general.credentials
     }
     const loginUserAsyncThunkAction = {
       type: 'login/loginThunk',
       payload: {
-        userId: validUserId,
+        username: validUsername,
         password: validPassword
       } as ILoginPayload
     }
-    // notice that only the general error message is set and not the userId or password error messages
+    // notice that only the general error message is set and not the username or password error messages
     const resolvedLoginUserDispatch = {
       meta: { requestStatus: "rejected" },
       payload: {
@@ -232,20 +232,20 @@ describe('Login Component', () => {
         status: 400,
         user: null,
         fields: {
-          userId: [],
+          username: [],
           password: []
         }
       } as IErrorData
     };
-    const userIdInput = screen.getByLabelText(/ID/i);
+    const usernameInput = screen.getByLabelText(/ID/i);
     const passwordInput = screen.getByLabelText(/Password/i);
     mocks.loginUser.mockResolvedValue(loginUserAsyncThunkAction);
     mocks.dispatch.mockReturnValue(await Promise.resolve(resolvedLoginUserDispatch));
     // Set valid values that pass input validation but fail login
-    fireEvent.change(userIdInput, { target: { value: validUserId } });
+    fireEvent.change(usernameInput, { target: { value: validUsername } });
     fireEvent.change(passwordInput, { target: { value: validPassword } });
     await waitFor(() => {
-      expect(userIdInput).toHaveValue(validUserId);
+      expect(usernameInput).toHaveValue(validUsername);
       expect(passwordInput).toHaveValue(validPassword);
     });
     fireEvent.click(screen.getByRole('button', { name: /Login/i }));
@@ -258,18 +258,18 @@ describe('Login Component', () => {
       expect(await screen.findByText(loginErrorMessages.general)).toBeInTheDocument();
     });
   });
-  test('handleSubmitLogin sets userId error message when clicking on login button with an invalid userId', async () => {
-    const invalidUserId = "b";
+  test('handleSubmitLogin sets username error message when clicking on login button with an invalid username', async () => {
+    const invalidUsername = "b";
     const validPassword = "Password123";
     const loginErrorMessages = {
-      userId: authentication.login.errorMessages.userId.invalid,
+      username: authentication.login.errorMessages.username.invalid,
       password: authentication.login.errorMessages.password.invalid,
       general: authentication.login.errorMessages.general.credentials
     }
     const loginUserAsyncThunkAction = {
       type: 'login/loginThunk',
       payload: {
-        userId: invalidUserId,
+        username: invalidUsername,
         password: validPassword
       } as ILoginPayload
     }
@@ -280,19 +280,19 @@ describe('Login Component', () => {
         status: 400,
         user: null,
         fields: {
-          userId: [],
+          username: [],
           password: []
         }
       } as IErrorData
     }
-    const userIdInput = screen.getByLabelText(/ID/i);
+    const usernameInput = screen.getByLabelText(/ID/i);
     const passwordInput = screen.getByLabelText(/Password/i);
     mocks.loginUser.mockResolvedValue(loginUserAsyncThunkAction);
     mocks.dispatch.mockReturnValue(await Promise.resolve(resolvedLoginUserDispatchWithGeneralError));
-    fireEvent.change(userIdInput, { target: { value: invalidUserId } });
+    fireEvent.change(usernameInput, { target: { value: invalidUsername } });
     fireEvent.change(passwordInput, { target: { value: validPassword } });
     await waitFor(() => {
-      expect(userIdInput).toHaveValue(invalidUserId);
+      expect(usernameInput).toHaveValue(invalidUsername);
       expect(passwordInput).toHaveValue(validPassword);
     });
     fireEvent.click(screen.getByRole('button', { name: /Login/i }));
@@ -300,23 +300,23 @@ describe('Login Component', () => {
     await waitFor(() => {
       expect(mocks.dispatch).not.toHaveBeenCalled();
     });
-    // verify that the userId error message is displayed
+    // verify that the username error message is displayed
     await waitFor(async () => {
-      expect(await screen.findByText(loginErrorMessages.userId)).toBeInTheDocument();
+      expect(await screen.findByText(loginErrorMessages.username)).toBeInTheDocument();
     });
   });
-  test('handleSubmitLogin does not set general error message when clicking on the button login with an invalid userId', async () => {
-    const invalidUserId = "b";
+  test('handleSubmitLogin does not set general error message when clicking on the button login with an invalid username', async () => {
+    const invalidUsername = "b";
     const validPassword = "Password123";
     const loginErrorMessages = {
-      userId: authentication.login.errorMessages.userId.invalid,
+      username: authentication.login.errorMessages.username.invalid,
       password: authentication.login.errorMessages.password.invalid,
       general: authentication.login.errorMessages.general.credentials
     }
     const loginUserAsyncThunkAction = {
       type: 'login/loginThunk',
       payload: {
-        userId: invalidUserId,
+        username: invalidUsername,
         password: validPassword
       } as ILoginPayload
     }
@@ -327,19 +327,19 @@ describe('Login Component', () => {
         status: 400,
         user: null,
         fields: {
-          userId: [],
+          username: [],
           password: []
         }
       } as IErrorData
     }
-    const userIdInput = screen.getByLabelText(/ID/i);
+    const usernameInput = screen.getByLabelText(/ID/i);
     const passwordInput = screen.getByLabelText(/Password/i);
     mocks.loginUser.mockResolvedValue(loginUserAsyncThunkAction);
     mocks.dispatch.mockReturnValue(await Promise.resolve(resolvedLoginUserDispatchWithGeneralError));
-    fireEvent.change(userIdInput, { target: { value: invalidUserId } });
+    fireEvent.change(usernameInput, { target: { value: invalidUsername } });
     fireEvent.change(passwordInput, { target: { value: validPassword } });
     await waitFor(() => {
-      expect(userIdInput).toHaveValue(invalidUserId);
+      expect(usernameInput).toHaveValue(invalidUsername);
       expect(passwordInput).toHaveValue(validPassword);
     });
     fireEvent.click(screen.getByRole('button', { name: /Login/i }));
@@ -354,16 +354,16 @@ describe('Login Component', () => {
   });
   test('handleSubmitLogin sets password error message when clicking on login button with an invalid password', async () => {
     const loginErrorMessages = {
-      userId: authentication.login.errorMessages.userId.invalid,
+      username: authentication.login.errorMessages.username.invalid,
       password: authentication.login.errorMessages.password.invalid,
       general: authentication.login.errorMessages.general.credentials
     }
-    const validUserId = 'user@email.com';
+    const validUsername = 'user@email.com';
     const invalidPassword = 'b';
     const loginUserAsyncThunkAction = {
       type: 'login/loginThunk',
       payload: {
-        userId: validUserId,
+        username: validUsername,
         password: invalidPassword
       } as ILoginPayload
     }
@@ -374,19 +374,19 @@ describe('Login Component', () => {
         status: 400,
         user: null,
         fields: {
-          userId: [],
+          username: [],
           password: []
         }
       } as IErrorData
     }
-    const userIdInput = screen.getByLabelText(/ID/i);
+    const usernameInput = screen.getByLabelText(/ID/i);
     const passwordInput = screen.getByLabelText(/Password/i);
     mocks.loginUser.mockResolvedValue(loginUserAsyncThunkAction);
     mocks.dispatch.mockReturnValue(await Promise.resolve(resolvedLoginUserDispatch));
-    fireEvent.change(userIdInput, { target: { value: validUserId } });
+    fireEvent.change(usernameInput, { target: { value: validUsername } });
     fireEvent.change(passwordInput, { target: { value: invalidPassword } });
     await waitFor(() => {
-      expect(userIdInput).toHaveValue(validUserId);
+      expect(usernameInput).toHaveValue(validUsername);
       expect(passwordInput).toHaveValue(invalidPassword);
     });
     fireEvent.click(screen.getByRole('button', { name: /Login/i }));
@@ -401,16 +401,16 @@ describe('Login Component', () => {
   });
   test('handleSubmitLogin does not set general error message when clicking on the button login with an invalid password', async () => {
     const loginErrorMessages = {
-      userId: authentication.login.errorMessages.userId.invalid,
+      username: authentication.login.errorMessages.username.invalid,
       password: authentication.login.errorMessages.password.invalid,
       general: authentication.login.errorMessages.general.credentials
     }
-    const validUserId = 'user@email.com';
+    const validUsername = 'user@email.com';
     const invalidPassword = 'b';
     const loginUserAsyncThunkAction = {
       type: 'login/loginThunk',
       payload: {
-        userId: validUserId,
+        username: validUsername,
         password: invalidPassword
       } as ILoginPayload
     }
@@ -421,19 +421,19 @@ describe('Login Component', () => {
         status: 400,
         user: null,
         fields: {
-          userId: [],
+          username: [],
           password: []
         }
       } as IErrorData
     }
-    const userIdInput = screen.getByLabelText(/ID/i);
+    const usernameInput = screen.getByLabelText(/ID/i);
     const passwordInput = screen.getByLabelText(/Password/i);
     mocks.loginUser.mockResolvedValue(loginUserAsyncThunkAction);
     mocks.dispatch.mockReturnValue(await Promise.resolve(resolvedLoginUserDispatch));
-    fireEvent.change(userIdInput, { target: { value: validUserId } });
+    fireEvent.change(usernameInput, { target: { value: validUsername } });
     fireEvent.change(passwordInput, { target: { value: invalidPassword } });
     await waitFor(() => {
-      expect(userIdInput).toHaveValue(validUserId);
+      expect(usernameInput).toHaveValue(validUsername);
       expect(passwordInput).toHaveValue(invalidPassword);
     });
     fireEvent.click(screen.getByRole('button', { name: /Login/i }));
@@ -448,16 +448,16 @@ describe('Login Component', () => {
   });
   test('handleSubmitLogin does not set password error message when clicking on the button login with an invalid user and a valid password', async () => {
     const loginErrorMessages = {
-      userId: authentication.login.errorMessages.userId.invalid,
+      username: authentication.login.errorMessages.username.invalid,
       password: authentication.login.errorMessages.password.invalid,
       general: authentication.login.errorMessages.general.credentials
     }
-    const invalidUserId = 'b';
+    const invalidUsername = 'b';
     const validPassword = 'Password123';
     const loginUserAsyncThunkAction = {
       type: 'login/loginThunk',
       payload: {
-        userId: invalidUserId,
+        username: invalidUsername,
         password: validPassword
       } as ILoginPayload
     }
@@ -468,19 +468,19 @@ describe('Login Component', () => {
         status: 400,
         user: null,
         fields: {
-          userId: [],
+          username: [],
           password: []
         }
       } as IErrorData
     }
-    const userIdInput = screen.getByLabelText(/ID/i);
+    const usernameInput = screen.getByLabelText(/ID/i);
     const passwordInput = screen.getByLabelText(/Password/i);
     mocks.loginUser.mockResolvedValue(loginUserAsyncThunkAction);
     mocks.dispatch.mockReturnValue(await Promise.resolve(resolvedLoginUserDispatch));
-    fireEvent.change(userIdInput, { target: { value: invalidUserId } });
+    fireEvent.change(usernameInput, { target: { value: invalidUsername } });
     fireEvent.change(passwordInput, { target: { value: validPassword } });
     await waitFor(() => {
-      expect(userIdInput).toHaveValue(invalidUserId);
+      expect(usernameInput).toHaveValue(invalidUsername);
       expect(passwordInput).toHaveValue(validPassword);
     });
     fireEvent.click(screen.getByRole('button', { name: /Login/i }));
@@ -493,18 +493,18 @@ describe('Login Component', () => {
       expect(screen.queryByText(loginErrorMessages.password)).not.toBeInTheDocument();
     });
   });
-  test('handleSubmitLogin does not set userId error message when clicking on the button login with a valid user and an invalid password', async () => {
+  test('handleSubmitLogin does not set username error message when clicking on the button login with a valid user and an invalid password', async () => {
     const loginErrorMessages = {
-      userId: authentication.login.errorMessages.userId.invalid,
+      username: authentication.login.errorMessages.username.invalid,
       password: authentication.login.errorMessages.password.invalid,
       general: authentication.login.errorMessages.general.credentials
     }
-    const validUserId = 'user@email.com';
+    const validUsername = 'user@email.com';
     const invalidPassword = 'b';
     const loginUserAsyncThunkAction = {
       type: 'login/loginThunk',
       payload: {
-        userId: validUserId,
+        username: validUsername,
         password: invalidPassword
       } as ILoginPayload
     }
@@ -515,19 +515,19 @@ describe('Login Component', () => {
         status: 400,
         user: null,
         fields: {
-          userId: [],
+          username: [],
           password: []
         }
       } as IErrorData
     }
-    const userIdInput = screen.getByLabelText(/ID/i);
+    const usernameInput = screen.getByLabelText(/ID/i);
     const passwordInput = screen.getByLabelText(/Password/i);
     mocks.loginUser.mockResolvedValue(loginUserAsyncThunkAction);
     mocks.dispatch.mockReturnValue(await Promise.resolve(resolvedLoginUserDispatch));
-    fireEvent.change(userIdInput, { target: { value: validUserId } });
+    fireEvent.change(usernameInput, { target: { value: validUsername } });
     fireEvent.change(passwordInput, { target: { value: invalidPassword } });
     await waitFor(() => {
-      expect(userIdInput).toHaveValue(validUserId);
+      expect(usernameInput).toHaveValue(validUsername);
       expect(passwordInput).toHaveValue(invalidPassword);
     });
     fireEvent.click(screen.getByRole('button', { name: /Login/i }));
@@ -535,57 +535,57 @@ describe('Login Component', () => {
     await waitFor(() => {
       expect(mocks.dispatch).not.toHaveBeenCalled();
     });
-    // verify that the userId error message is not displayed
+    // verify that the username error message is not displayed
     await waitFor(async () => {
-      expect(screen.queryByText(loginErrorMessages.userId)).not.toBeInTheDocument();
+      expect(screen.queryByText(loginErrorMessages.username)).not.toBeInTheDocument();
     });
   });
 
-  test('handleUserIdOnChange clears userId error message', async () => {
-    const validUserId = 'user@email.com';
+  test('handleusernameOnChange clears username error message', async () => {
+    const validUsername = 'user@email.com';
     const validPassword = 'Password123';
-    const invalidUserId = 'b';
+    const invalidUsername = 'b';
     const loginErrorMessages = {
-      userId: authentication.login.errorMessages.userId.invalid,
+      username: authentication.login.errorMessages.username.invalid,
       password: authentication.login.errorMessages.password.invalid,
       general: authentication.login.errorMessages.general.credentials
     }
-    // Do the steps to display an userId error message
-    const userIdInput = screen.getByLabelText(/ID/i);
+    // Do the steps to display an username error message
+    const usernameInput = screen.getByLabelText(/ID/i);
     const passwordInput = screen.getByLabelText(/Password/i);
 
-    fireEvent.change(userIdInput, { target: { value: invalidUserId } });
+    fireEvent.change(usernameInput, { target: { value: invalidUsername } });
     fireEvent.change(passwordInput, { target: { value: validPassword } });
     await waitFor(() => {
-      expect(userIdInput).toHaveValue(invalidUserId);
+      expect(usernameInput).toHaveValue(invalidUsername);
       expect(passwordInput).toHaveValue(validPassword);
     });
     fireEvent.click(screen.getByRole('button', { name: /Login/i }));
-    // verify that the userId error message is displayed
+    // verify that the username error message is displayed
     await waitFor(async () => {
-      expect(await screen.findByText(loginErrorMessages.userId)).toBeInTheDocument();
+      expect(await screen.findByText(loginErrorMessages.username)).toBeInTheDocument();
     });
-    // update userId input
-    fireEvent.change(userIdInput, { target: { value: validUserId } });
+    // update username input
+    fireEvent.change(usernameInput, { target: { value: validUsername } });
     await waitFor(() => {
-      expect(userIdInput).toHaveValue(validUserId);
-      expect(screen.queryByText(loginErrorMessages.userId)).not.toBeInTheDocument();
+      expect(usernameInput).toHaveValue(validUsername);
+      expect(screen.queryByText(loginErrorMessages.username)).not.toBeInTheDocument();
     });
   });
-  test('handleUserIdOnChange clears general error message', async () => {
-    const validUserId = 'user@email.com';
+  test('handleusernameOnChange clears general error message', async () => {
+    const validUsername = 'user@email.com';
     const validPassword = 'Password123';
-    const invalidUserId = 'b';
+    const invalidUsername = 'b';
     const invalidPassword = 'b';
     const loginErrorMessages = {
-      userId: authentication.login.errorMessages.userId.invalid,
+      username: authentication.login.errorMessages.username.invalid,
       password: authentication.login.errorMessages.password.invalid,
       general: authentication.login.errorMessages.general.credentials
     }
     const loginUserAsyncThunkAction = {
       type: 'login/loginThunk',
       payload: {
-        userId: validUserId,
+        username: validUsername,
         password: invalidPassword
       } as ILoginPayload
     }
@@ -596,21 +596,21 @@ describe('Login Component', () => {
         status: 400,
         user: null,
         fields: {
-          userId: [],
+          username: [],
           password: []
         }
       } as IErrorData
     }
-    // Do the steps to display an userId error message
-    const userIdInput = screen.getByLabelText(/ID/i);
+    // Do the steps to display an username error message
+    const usernameInput = screen.getByLabelText(/ID/i);
     const passwordInput = screen.getByLabelText(/Password/i);
     mocks.loginUser.mockResolvedValue(loginUserAsyncThunkAction);
     mocks.dispatch.mockReturnValue(await Promise.resolve(resolvedLoginUserDispatch));
 
-    fireEvent.change(userIdInput, { target: { value: validUserId } });
+    fireEvent.change(usernameInput, { target: { value: validUsername } });
     fireEvent.change(passwordInput, { target: { value: validPassword } });
     await waitFor(() => {
-      expect(userIdInput).toHaveValue(validUserId);
+      expect(usernameInput).toHaveValue(validUsername);
       expect(passwordInput).toHaveValue(validPassword);
     });
     fireEvent.click(screen.getByRole('button', { name: /Login/i }));
@@ -618,33 +618,33 @@ describe('Login Component', () => {
     await waitFor(async () => {
       expect(await screen.findByText(loginErrorMessages.general)).toBeInTheDocument();
     });
-    // update the userId input
-    // event though the userId is invalid, the general error message should be cleared
+    // update the username input
+    // even though the username is invalid, the general error message should be cleared
     // because the button is not clicked after the password is updated
-    fireEvent.change(userIdInput, { target: { value: invalidUserId } });
+    fireEvent.change(usernameInput, { target: { value: invalidUsername } });
     await waitFor(() => {
-      expect(userIdInput).toHaveValue(invalidUserId);
+      expect(usernameInput).toHaveValue(invalidUsername);
       // verify that the general error message is not displayed
       expect(screen.queryByText(loginErrorMessages.general)).not.toBeInTheDocument();
     });
   });
-  test('handleUserIdOnChange does not clear password error message', async () => {
-    const validUserId = 'user@email.com';
-    const invalidUserId = 'b';
+  test('handleusernameOnChange does not clear password error message', async () => {
+    const validUsername = 'user@email.com';
+    const invalidUsername = 'b';
     const invalidPassword = 'b';
     const loginErrorMessages = {
-      userId: authentication.login.errorMessages.userId.invalid,
+      username: authentication.login.errorMessages.username.invalid,
       password: authentication.login.errorMessages.password.invalid,
       general: authentication.login.errorMessages.general.credentials
     }
-    // Do the steps to display an userId error message
-    const userIdInput = screen.getByLabelText(/ID/i);
+    // Do the steps to display an username error message
+    const usernameInput = screen.getByLabelText(/ID/i);
     const passwordInput = screen.getByLabelText(/Password/i);
 
-    fireEvent.change(userIdInput, { target: { value: invalidUserId } });
+    fireEvent.change(usernameInput, { target: { value: invalidUsername } });
     fireEvent.change(passwordInput, { target: { value: invalidPassword } });
     await waitFor(() => {
-      expect(userIdInput).toHaveValue(invalidUserId);
+      expect(usernameInput).toHaveValue(invalidUsername);
       expect(passwordInput).toHaveValue(invalidPassword);
     });
     fireEvent.click(screen.getByRole('button', { name: /Login/i }));
@@ -652,39 +652,39 @@ describe('Login Component', () => {
     await waitFor(async () => {
       expect(await screen.findByText(loginErrorMessages.password)).toBeInTheDocument();
     });
-    // update the userId input
-    fireEvent.change(userIdInput, { target: { value: validUserId } });
+    // update the username input
+    fireEvent.change(usernameInput, { target: { value: validUsername } });
     await waitFor(async () => {
-      expect(userIdInput).toHaveValue(validUserId);
+      expect(usernameInput).toHaveValue(validUsername);
     // verify that the password error message is still displayed
       expect(await screen.findByText(loginErrorMessages.password)).toBeInTheDocument();
     });
   });
   test('handlePasswordOnChange clears password error message', async () => {
-    const validUserId = 'user@email.com';
+    const validUsername = 'user@email.com';
     const validPassword = 'Password123';
     const invalidPassword = 'b';
     const loginErrorMessages = {
-      userId: authentication.login.errorMessages.userId.invalid,
+      username: authentication.login.errorMessages.username.invalid,
       password: authentication.login.errorMessages.password.invalid,
       general: authentication.login.errorMessages.general.credentials
     }
-    // Do the steps to display an userId error message
-    const userIdInput = screen.getByLabelText(/ID/i);
+    // Do the steps to display an username error message
+    const usernameInput = screen.getByLabelText(/ID/i);
     const passwordInput = screen.getByLabelText(/Password/i);
 
-    fireEvent.change(userIdInput, { target: { value: validUserId } });
+    fireEvent.change(usernameInput, { target: { value: validUsername } });
     fireEvent.change(passwordInput, { target: { value: invalidPassword } });
     await waitFor(() => {
-      expect(userIdInput).toHaveValue(validUserId);
+      expect(usernameInput).toHaveValue(validUsername);
       expect(passwordInput).toHaveValue(invalidPassword);
     });
     fireEvent.click(screen.getByRole('button', { name: /Login/i }));
-    // verify that the userId error message is displayed
+    // verify that the username error message is displayed
     await waitFor(async () => {
       expect(await screen.findByText(loginErrorMessages.password)).toBeInTheDocument();
     });
-    // update userId input
+    // update username input
     fireEvent.change(passwordInput, { target: { value: validPassword } });
     await waitFor(() => {
       expect(passwordInput).toHaveValue(validPassword);
@@ -692,18 +692,18 @@ describe('Login Component', () => {
     });
   });
   test('handlePasswordOnChange clears general error message', async () => {
-    const validUserId = 'user@email.com';
+    const validUsername = 'user@email.com';
     const validPassword = 'Password123';
     const invalidPassword = 'b';
     const loginErrorMessages = {
-      userId: authentication.login.errorMessages.userId.invalid,
+      username: authentication.login.errorMessages.username.invalid,
       password: authentication.login.errorMessages.password.invalid,
       general: authentication.login.errorMessages.general.credentials
     }
     const loginUserAsyncThunkAction = {
       type: 'login/loginThunk',
       payload: {
-        userId: validUserId,
+        username: validUsername,
         password: invalidPassword
       } as ILoginPayload
     }
@@ -714,21 +714,21 @@ describe('Login Component', () => {
         status: 400,
         user: null,
         fields: {
-          userId: [],
+          username: [],
           password: []
         }
       } as IErrorData
     }
-    // Do the steps to display an userId error message
-    const userIdInput = screen.getByLabelText(/ID/i);
+    // Do the steps to display an username error message
+    const usernameInput = screen.getByLabelText(/ID/i);
     const passwordInput = screen.getByLabelText(/Password/i);
     mocks.loginUser.mockResolvedValue(loginUserAsyncThunkAction);
     mocks.dispatch.mockReturnValue(await Promise.resolve(resolvedLoginUserDispatch));
 
-    fireEvent.change(userIdInput, { target: { value: validUserId } });
+    fireEvent.change(usernameInput, { target: { value: validUsername } });
     fireEvent.change(passwordInput, { target: { value: validPassword } });
     await waitFor(() => {
-      expect(userIdInput).toHaveValue(validUserId);
+      expect(usernameInput).toHaveValue(validUsername);
       expect(passwordInput).toHaveValue(validPassword);
     });
     fireEvent.click(screen.getByRole('button', { name: /Login/i }));
@@ -746,36 +746,36 @@ describe('Login Component', () => {
       expect(screen.queryByText(loginErrorMessages.general)).not.toBeInTheDocument();
     });
   });
-  test('handlePasswordOnChange does not clear userId error message', async () => {
+  test('handlePasswordOnChange does not clear username error message', async () => {
     const validPassword = 'Password123';
-    const invalidUserId = 'b';
+    const invalidUsername = 'b';
     const invalidPassword = 'b';
     const loginErrorMessages = {
-      userId: authentication.login.errorMessages.userId.invalid,
+      username: authentication.login.errorMessages.username.invalid,
       password: authentication.login.errorMessages.password.invalid,
       general: authentication.login.errorMessages.general.credentials
     }
-    // Do the steps to display an userId error message
-    const userIdInput = screen.getByLabelText(/ID/i);
+    // Do the steps to display an username error message
+    const usernameInput = screen.getByLabelText(/ID/i);
     const passwordInput = screen.getByLabelText(/Password/i);
 
-    fireEvent.change(userIdInput, { target: { value: invalidUserId } });
+    fireEvent.change(usernameInput, { target: { value: invalidUsername } });
     fireEvent.change(passwordInput, { target: { value: invalidPassword } });
     await waitFor(() => {
-      expect(userIdInput).toHaveValue(invalidUserId);
+      expect(usernameInput).toHaveValue(invalidUsername);
       expect(passwordInput).toHaveValue(invalidPassword);
     });
     fireEvent.click(screen.getByRole('button', { name: /Login/i }));
-    // verify that the userId error message is displayed
+    // verify that the username error message is displayed
     await waitFor(async () => {
-      expect(await screen.findByText(loginErrorMessages.userId)).toBeInTheDocument();
+      expect(await screen.findByText(loginErrorMessages.username)).toBeInTheDocument();
     });
     // update the password input
     fireEvent.change(passwordInput, { target: { value: validPassword } });
     await waitFor(async () => {
       expect(passwordInput).toHaveValue(validPassword);
-    // verify that the userId error message is still displayed
-      expect(await screen.findByText(loginErrorMessages.userId)).toBeInTheDocument();
+    // verify that the username error message is still displayed
+      expect(await screen.findByText(loginErrorMessages.username)).toBeInTheDocument();
     });
   });
 

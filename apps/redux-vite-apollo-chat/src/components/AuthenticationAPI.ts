@@ -1,8 +1,8 @@
-import { IErrorData, IValidData, ILoginPayload, IRegisterPayload, ILogoutPayload, ISessionData } from "@appTypes/types";
+import { IErrorData, IValidData, ILoginPayload, IRegisterPayload, ISessionData } from "@appTypes/types";
 
 // Code for login API
 const API_LOGIN_URL = import.meta.env.VITE_API_LOGIN_URL;
-export const postLogin = async (userId: string, password: string, keepLogged: boolean): Promise<IValidData | IErrorData> => {
+export const postLogin = async (username: string, password: string, keepLogged: boolean): Promise<IValidData | IErrorData> => {
   try {
     const response = await fetch(API_LOGIN_URL, {
       method: "POST",
@@ -10,7 +10,7 @@ export const postLogin = async (userId: string, password: string, keepLogged: bo
         "Content-Type": "application/json",
       },
       credentials: "include", // Include cookies in the request
-      body: JSON.stringify({ userId, password, keepLogged } as ILoginPayload),
+      body: JSON.stringify({ username, password, keepLogged } as ILoginPayload),
     });
     if (!response.ok) {
       const loginError: IErrorData = await response.json();
@@ -25,7 +25,7 @@ export const postLogin = async (userId: string, password: string, keepLogged: bo
       message: 'Login: Server error. Please try again later.',
       user: null,
       fields: {
-        userId: [],
+        username: [],
         password: []
       }
     }
@@ -80,7 +80,7 @@ export const postRefreshToken = async (): Promise<IValidData | IErrorData> => {
 };
 
 const API_REGISTER_URL = import.meta.env.VITE_API_REGISTER_URL;
-export const postRegister = async (userId: string, password: string, nickname: string): Promise<IValidData | IErrorData> => {
+export const postRegister = async (username: string, password: string, nickname: string): Promise<IValidData | IErrorData> => {
   try {
     const response = await fetch(API_REGISTER_URL, {
       method: "POST",
@@ -88,7 +88,7 @@ export const postRegister = async (userId: string, password: string, nickname: s
         "Content-Type": "application/json",
       },
       credentials: "include", // Include cookies in the request
-      body: JSON.stringify({ userId, password, nickname } as IRegisterPayload),
+      body: JSON.stringify({ username, password, nickname } as IRegisterPayload),
     });
     if (!response.ok) {
       const errorData: IErrorData = await response.json();
@@ -103,7 +103,7 @@ export const postRegister = async (userId: string, password: string, nickname: s
       message: "Register: Server error. Please try again later.",
       user: null,
       fields: {
-        userId: [],
+        username: [],
         password: [],
         nickname: []
       }
@@ -135,15 +135,11 @@ export const getCheckSession = async (): Promise<ISessionData | IErrorData> => {
 }
 
 const API_LOGOUT_URL = import.meta.env.VITE_API_LOGOUT_URL;
-export const postLogout = async (userId: string) => {
+export const postLogout = async () => {
   try {
     const response = await fetch(API_LOGOUT_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
       credentials: "include", // Include cookies in the request
-      body: JSON.stringify({ userId } as ILogoutPayload),
     });
     if (!response.ok) {
       const errorData: IErrorData = await response.json();

@@ -10,12 +10,12 @@ const initialState: RegisterSliceState = {
 
 export const registerUser = createAsyncThunk(
   "registerThunk",
-  async ({ userId, password, nickname }: IRegisterPayload, thunkAPI) => {
-    const response = await postRegister(userId, password, nickname)
+  async ({ username, password, nickname }: IRegisterPayload, thunkAPI) => {
+    const response = await postRegister(username, password, nickname)
     if (isErrorData(response)) {
       return thunkAPI.rejectWithValue(response)
     } else {
-      thunkAPI.dispatch(setLoggedUser({ id: response.user.id, nickname: response.user.nickname }));
+      thunkAPI.dispatch(setLoggedUser({ publicId: response.user.publicId, nickname: response.user.nickname }));
       thunkAPI.dispatch(setPage('chat'));
       return thunkAPI.fulfillWithValue(response);
     }

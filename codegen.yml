@@ -1,0 +1,15 @@
+schema: ./apps/express-passport-graphql-chat/src/schema.graphql
+generates:
+  ./apps/express-passport-graphql-chat/src/generated/graphql.ts:
+    plugins:
+      - add:
+          content: '/* eslint-disable @typescript-eslint/no-empty-object-type */'
+      - typescript
+      - typescript-resolvers
+    config:
+      useIndexSignature: true
+      avoidOptionals: true
+      enumsAsTypes: true
+      useTypeImports: true
+      contextType: ../graphql-context#GraphQLContext
+      rootValueType: Record<string, never>

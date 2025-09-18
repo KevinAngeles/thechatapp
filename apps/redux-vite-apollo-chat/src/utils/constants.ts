@@ -1,8 +1,8 @@
 export const authentication = {
     "login": {
         "errorMessages": {
-            "userId": {
-                "invalid": "Invalid user id",
+            "username": {
+                "invalid": "Invalid username",
             },
             "password": {
                 "invalid": "Password must contain at least 8 characters, including letters and numbers",
@@ -18,9 +18,9 @@ export const authentication = {
     },
     "registration": {
         "errorMessages": {
-            "userId": {
-                "invalid": "Invalid user id",
-                "exist": "User id already exists",
+            "username": {
+                "invalid": "Invalid username",
+                "exist": "Username already exists",
             },
             "password": {
                 "invalid": "Password must contain at least 8 characters, including letters and numbers"
